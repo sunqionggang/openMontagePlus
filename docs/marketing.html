@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenMontage · 对话式 AI 视频创作平台</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --line:#e3e8f0; --text:#18202f; --muted:#6b7688;
+    --brand:#2b6de8; --brand-d:#1e55c4; --brand-soft:#e8effd;
+    --ok:#12a150; --run:#e8851e; --dark:#0e1524;
+    --shadow:0 1px 3px rgba(20,32,60,.07),0 4px 16px rgba(20,32,60,.05);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+  a{color:var(--brand);text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;height:60px;gap:24px}
+  .logo{font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
+  .logo .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2b6de8,#4c8dff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+  .nav-links{display:flex;gap:18px;margin-left:auto;font-weight:500}
+  .nav-links a{color:#4a5568;font-size:14px}
+  .nav-links a:hover{color:var(--brand)}
+  .nav .cta{padding:8px 16px;background:var(--brand);color:#fff;border-radius:9px;font-weight:600;font-size:13px}
+  .nav .cta:hover{background:var(--brand-d);color:#fff}
+
+  /* hero */
+  .hero{background:linear-gradient(150deg,#12305e 0%,#1e4ea8 55%,#2b6de8 100%);color:#fff;padding:70px 0 66px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-140px;bottom:-140px;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,.07)}
+  .hero h1{font-size:38px;line-height:1.25;margin:0 0 14px;font-weight:800}
+  .hero p{font-size:16px;opacity:.88;max-width:560px;margin:0 0 26px}
+  .hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;font-size:14px;font-weight:600;padding:12px 22px;cursor:pointer;transition:.15s}
+  .btn-white{background:#fff;color:var(--brand-d)}
+  .btn-white:hover{background:#e8effd}
+  .btn-ghost-w{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3)}
+  .btn-ghost-w:hover{background:rgba(255,255,255,.2)}
+  .hero .stats{display:flex;gap:36px;margin-top:40px}
+  .hero .stats b{display:block;font-size:24px;font-weight:800}
+  .hero .stats span{font-size:12px;opacity:.75}
+
+  section{padding:56px 0}
+  .sec-head{text-align:center;margin-bottom:36px}
+  .sec-head h2{font-size:26px;font-weight:800;margin:0 0 8px}
+  .sec-head p{color:var(--muted);margin:0;font-size:14px}
+  .sec-head .tag{display:inline-block;font-size:12px;font-weight:700;color:var(--brand-d);background:var(--brand-soft);border-radius:99px;padding:4px 14px;margin-bottom:12px}
+
+  /* pricing */
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
+  @media(max-width:800px){.price-grid{grid-template-columns:1fr}}
+  .price-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative}
+  .price-card.hot{border:2px solid var(--brand);box-shadow:0 10px 34px rgba(43,109,232,.16)}
+  .price-card .hot-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:99px}
+  .price-card .pname{font-size:15px;font-weight:700}
+  .price-card .price{font-size:34px;font-weight:800;margin:10px 0 4px}
+  .price-card .price small{font-size:14px;font-weight:400;color:var(--muted)}
+  .price-card .pdesc{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  .price-card ul{list-style:none;padding:0;margin:0 0 20px;flex:1}
+  .price-card li{font-size:13px;padding:6px 0;display:flex;gap:8px;align-items:center}
+  .price-card li::before{content:"✓";color:var(--ok);font-weight:700}
+  .price-card li.no::before{content:"—";color:#c3cad6}
+  .price-card .btn{width:100%}
+  .btn-brand{background:var(--brand);color:#fff}
+  .btn-brand:hover{background:var(--brand-d)}
+  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--text)}
+  .btn-outline:hover{border-color:var(--brand);color:var(--brand)}
+
+  /* cases */
+  .case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:800px){.case-grid{grid-template-columns:1fr}}
+  .case-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+  .case-card video{width:100%;aspect-ratio:16/9;display:block;background:#0e1524}
+  .case-body{padding:16px 18px}
+  .case-body .ct{font-size:14.5px;font-weight:700;margin:0 0 4px}
+  .case-body .cm{font-size:12px;color:var(--muted);display:flex;gap:12px;margin-bottom:10px}
+  .case-body .cp{font-size:12.5px;color:#4a5568}
+  .tagline{display:inline-block;font-size:11px;font-weight:700;background:var(--brand-soft);color:var(--brand-d);border-radius:6px;padding:2px 9px;margin-right:6px}
+
+  /* faq */
+  .faq-list{max-width:760px;margin:0 auto}
+  .faq-item{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+  .faq-q{width:100%;text-align:left;background:none;border:0;padding:16px 20px;font-size:14.5px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:inherit;color:var(--text)}
+  .faq-q .arrow{transition:.2s;color:var(--muted)}
+  .faq-item.open .arrow{transform:rotate(180deg)}
+  .faq-a{display:none;padding:0 20px 16px;font-size:13.5px;color:#4a5568;border-top:1px dashed var(--line);padding-top:12px}
+  .faq-item.open .faq-a{display:block}
+
+  /* footer */
+  footer{background:var(--dark);color:#aeb9cc;padding:40px 0 46px}
+  footer .wrap{display:flex;gap:50px;flex-wrap:wrap}
+  footer h4{color:#fff;font-size:13px;margin:0 0 10px}
+  footer a{color:#aeb9cc;font-size:13px;display:block;padding:3px 0}
+  footer a:hover{color:#fff}
+  footer .copyright{width:100%;margin-top:26px;font-size:12px;opacity:.6}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="wrap">
+    <div class="logo"><span class="mark">OM</span> OpenMontage</div>
+    <nav class="nav-links">
+      <a href="#pricing">定价</a>
+      <a href="#cases">案例</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="cta" href="/" onclick="return false">立即体验</a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="wrap">
+    <h1>一句话，生成你的 AI 视频<br>用你自己的 API Key，成本自己掌控</h1>
+    <p>OpenMontage 是对话式的 AI 视频创作平台：在网页上描述想法，AI 自动完成选题调研、脚本、分镜、素材生成、剪辑合成。BYOK 设计——填自己的 Key，不代付、不锁量。</p>
+    <div class="ctas">
+      <a class="btn btn-white" href="/" onclick="return false">🚀 免费开始创作</a>
+      <a class="btn btn-ghost-w" href="#cases">看真实案例</a>
+    </div>
+    <div class="stats">
+      <div><b>13</b><span>条生产流水线</span></div>
+      <div><b>7 阶段</b><span>全流程自动推进</span></div>
+      <div><b>BYOK</b><span>自带 Key 零锁定</span></div>
+      <div><b>100%</b><span>多用户数据隔离</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 定价 ============ -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">定价</span>
+      <h2>简单透明的订阅</h2>
+      <p>平台只收基础服务费，视频生成的 API 费用走你自己的 Key，明明白白</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="pname">免费版</div>
+        <div class="price">¥0<small> / 永久</small></div>
+        <div class="pdesc">体验全部核心流程，适合新手</div>
+        <ul>
+          <li>每日 3 次创意任务</li>
+          <li>720p 导出（带水印）</li>
+          <li>模板市场全部可用</li>
+          <li class="no">数字人口播</li>
+          <li class="no">长视频切片</li>
+          <li class="no">开放 API</li>
+        </ul>
+        <a class="btn btn-outline" href="/" onclick="return false">开始使用</a>
+      </div>
+      <div class="price-card hot">
+        <div class="hot-badge">最受欢迎</div>
+        <div class="pname">专业版</div>
+        <div class="price">¥29<small> / 月</small></div>
+        <div class="pdesc">创作者首选，全功能解锁</div>
+        <ul>
+          <li>每日 10 次创意任务</li>
+          <li>1080p 无水印导出</li>
+          <li>数字人口播（kling）</li>
+          <li>长视频切片 20 条/月</li>
+          <li>AI 标题/封面/标签</li>
+          <li class="no">开放 API</li>
+        </ul>
+        <a class="btn btn-brand" href="/" onclick="return false">升级专业版</a>
+      </div>
+      <div class="price-card">
+        <div class="pname">团队版</div>
+        <div class="price">¥99<small> / 月</small></div>
+        <div class="pdesc">团队协作与批量生产</div>
+        <ul>
+          <li>不限创意任务</li>
+          <li>4K 导出</li>
+          <li>团队共享素材库</li>
+          <li>数字人 / 切片不限</li>
+          <li>开放 API 接入</li>
+          <li>专属支持</li>
+        </ul>
+        <a class="btn btn-outline" href="/" onclick="return false">联系销售</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 案例 ============ -->
+<section id="cases" style="background:#eef2f8">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">真实案例</span>
+      <h2>从一句话到成片</h2>
+      <p>以下视频全部由 OpenMontage 流水线自动产出（点击播放）</p>
+    </div>
+    <div class="case-grid">
+      <div class="case-card">
+        <video controls preload="none" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270'%3E%3Crect width='100%25' height='100%25' fill='%230e1524'/%3E%3Ctext x='50%25' y='50%25' fill='%238fa3bf' font-size='16' text-anchor='middle' font-family='sans-serif'%3E海南清补凉·趣味动画%3C/text%3E%3C/svg%3E">
+          <source src="../projects/hainan-qingbuliang/renders/final.mp4" type="video/mp4">
+        </video>
+        <div class="case-body">
+          <p class="ct">海南清补凉 · 趣味动画</p>
+          <div class="cm"><span>⏱ 26s</span><span>pipeline: animated-explainer</span><span>😊 25.8k 播放</span></div>
+          <div class="cp"><span class="tagline">科普</span>AI 调研海南美食 → 6 个卡通场景 → TTS 配音 + 字幕</div>
+        </div>
+      </div>
+      <div class="case-card">
+        <video controls preload="none" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270'%3E%3Crect width='100%25' height='100%25' fill='%230e1524'/%3E%3Ctext x='50%25' y='50%25' fill='%238fa3bf' font-size='16' text-anchor='middle' font-family='sans-serif'%3E拼音启蒙·单韵母%3C/text%3E%3C/svg%3E">
+          <source src="../projects/pinyin-kids/renders/final.mp4" type="video/mp4">
+        </video>
+        <div class="case-body">
+          <p class="ct">拼音启蒙 · 单韵母 a o e i u ü</p>
+          <div class="cm"><span>⏱ 27s</span><span>pipeline: animated-explainer</span><span>👶 学前启蒙</span></div>
+          <div class="cp"><span class="tagline">教育</span>卡通动画 + 口型口诀 + 四声标注，儿童友好配色</div>
+        </div>
+      </div>
+      <div class="case-card">
+        <video controls preload="none" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270'%3E%3Crect width='100%25' height='100%25' fill='%230e1524'/%3E%3Ctext x='50%25' y='50%25' fill='%238fa3bf' font-size='16' text-anchor='middle' font-family='sans-serif'%3E海口电动车·城市篇%3C/text%3E%3C/svg%3E">
+          <source src="../projects/haikou-ev-city/renders/final.mp4" type="video/mp4">
+        </video>
+        <div class="case-body">
+          <p class="ct">海口电动车 · 城市出行</p>
+          <div class="cm"><span>⏱ 58s</span><span>pipeline: animated-explainer</span><span>🏙️ 城市生活</span></div>
+          <div class="cp"><span class="tagline">城市</span>运动实拍素材 + 语音旁白 + 中文字幕混音</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">FAQ</span>
+      <h2>常见问题</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">为什么是 BYOK？我填的 Key 安全吗？<span class="arrow">▾</span></button>
+        <div class="faq-a">BYOK（Bring Your Own Key）意味着你用自己注册的 API Key（如 OpenAI、可灵、百炼），平台不代付、不锁量、不涨价。你的 Key 加密存储，仅在任务运行期间注入进程，绝不写入日志，也绝不向其他用户暴露。你也可以随时在设置页吊销。</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">我完全不懂视频制作，能上手吗？<span class="arrow">▾</span></button>
+        <div class="faq-a">可以。你只需要在创作台用一句话描述想做的视频（例如"用动画解释 HTTP 和 HTTPS 的区别，90 秒"），AI 会自动完成选题、脚本、分镜、素材生成、配音和剪辑。也可以直接套用模板市场里的 13 条流水线。</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">一个视频大概要多少钱？<span class="arrow">▾</span></button>
+        <div class="faq-a">生成费用由你自己的 Key 承担，可精确到每步对账。一个 60 秒动画的典型成本约 ¥0.5–2（创意 LLM + 视频生成 + TTS），具体取决于你选的模型。平台订阅费（专业版 ¥29/月）只覆盖基础服务。</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">我的作品别人能看到吗？<span class="arrow">▾</span></button>
+        <div class="faq-a">默认完全隔离——你的项目、Key、作品、账单只有你自己可见。如果你愿意，可以一键"发布到公共广场"展示给所有用户，也可以随时下架。</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">能导出到什么格式？<span class="arrow">▾</span></button>
+        <div class="faq-a">支持 9:16（抖音/快手/视频号）、16:9（B站/YouTube）、1:1（信息流）三种比例，分辨率 720p / 1080p / 4K，H.264 + AAC。成片可下载 MP4，另可导出 SRT 字幕文件。</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">数据安全和隐私如何保证？<span class="arrow">▾</span></button>
+        <div class="faq-a">用户数据以 SQLite 本地存储（可自托管），密码使用 PBKDF2 加盐哈希；API Key 加密保存且只在任务运行时注入；作品默认私有。完整开源自托管（AGPLv3），可部署在你自己的服务器上。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ footer ============ -->
+<footer>
+  <div class="wrap">
+    <div>
+      <h4>产品</h4>
+      <a href="#pricing">定价</a><a href="#cases">案例</a><a href="#faq">FAQ</a>
+    </div>
+    <div>
+      <h4>功能</h4>
+      <a href="#cases" onclick="return false">对话式创作</a>
+      <a href="#cases" onclick="return false">数字人口播</a>
+      <a href="#cases" onclick="return false">二次创作切片</a>
+      <a href="#cases" onclick="return false">爆款雷达</a>
+    </div>
+    <div>
+      <h4>技术</h4>
+      <a href="#" onclick="return false">开源仓库（AGPLv3）</a>
+      <a href="#" onclick="return false">自托管文档</a>
+      <a href="#" onclick="return false">API 文档</a>
+    </div>
+    <div>
+      <h4>关于</h4>
+      <a href="#" onclick="return false">关于我们</a>
+      <a href="#" onclick="return false">联系方式</a>
+    </div>
+    <div class="copyright">© 2026 OpenMontage · 对话式 AI 视频创作平台 · 派生自 calesthio/OpenMontage（AGPLv3）</div>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(btn){
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(x => x.classList.remove('open'));
+  if(!wasOpen) item.classList.add('open');
+}
+</script>
+</body>
+</html>

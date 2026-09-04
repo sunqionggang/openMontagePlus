@@ -1,0 +1,2177 @@
+<!doctype html>
+<html lang="zh-CN" data-page-node-id="m5qhTYeX9DTDlZ5xyl4jgc">
+<head data-page-node-id="odmskevAb5xrYqaa8rhpL2">
+<meta charset="utf-8" data-page-node-id="oQ1E4jhwtgm01XDvHDowmW">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="AuH2rnU5M90wk2lb9RmtYk">
+<title>OpenMontage 产品原型 · 对话式视频创作平台</title>
+<style>
+  :root{
+    --bg:#f4f6fa; --card:#ffffff; --line:#e3e8f0; --text:#18202f; --muted:#6b7688;
+    --brand:#2b6de8; --brand-d:#1e55c4; --brand-soft:#e8effd;
+    --ok:#12a150; --ok-soft:#e2f7ea; --run:#e8851e; --run-soft:#fdf0df;
+    --bad:#d93a3a; --bad-soft:#fde8e8;
+    --shadow:0 1px 3px rgba(20,32,60,.07),0 4px 16px rgba(20,32,60,.05);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+       background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}
+  .hidden{display:none !important}
+  button{font-family:inherit;cursor:pointer}
+  input,textarea{font-family:inherit}
+
+  /* ---------- 登录页 ---------- */
+  #loginView{min-height:100vh;display:flex;align-items:stretch}
+  .login-left{flex:1.1;background:linear-gradient(150deg,#1a3a7a 0%,#2b6de8 55%,#4c8dff 100%);
+    color:#fff;padding:56px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+  .login-left::after{content:"";position:absolute;right:-120px;bottom:-120px;width:380px;height:380px;
+    border-radius:50%;background:rgba(255,255,255,.08)}
+  .login-left .logo{font-size:22px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+  .login-left h1{font-size:34px;line-height:1.3;margin:34px 0 14px;font-weight:800}
+  .login-left p{font-size:15px;opacity:.85;max-width:420px;margin:0 0 26px}
+  .feature-list{display:flex;flex-direction:column;gap:12px;max-width:420px}
+  .feature-list div{display:flex;gap:10px;align-items:flex-start;font-size:14px;opacity:.95}
+  .feature-list .ic{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+  .login-right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+  .login-card{width:100%;max-width:400px}
+  .login-card h2{font-size:24px;margin:0 0 6px}
+  .login-card .sub{color:var(--muted);margin:0 0 26px;font-size:14px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .field input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff}
+  .field input:focus{outline:2px solid #c6d9fb;border-color:var(--brand)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;
+       font-size:14px;font-weight:600;padding:11px 18px;transition:.15s}
+  .btn-primary{background:var(--brand);color:#fff;width:100%}
+  .btn-primary:hover{background:var(--brand-d)}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--text)}
+  .btn-ghost:hover{background:#f6f8fc}
+  .btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+  .login-switch{text-align:center;margin-top:18px;color:var(--muted);font-size:13px}
+  .login-switch a{color:var(--brand);text-decoration:none;font-weight:600}
+  .demo-hint{margin-top:22px;padding:13px 15px;background:var(--brand-soft);border-radius:10px;font-size:13px;color:#23489c}
+  .demo-hint b{color:var(--brand-d)}
+  .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:20px 0}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+  .social-row{display:flex;gap:10px}
+  .social-row .btn{flex:1}
+
+  /* ---------- 主布局 ---------- */
+  #appView{display:flex;min-height:100vh}
+  aside{width:224px;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .side-logo{padding:20px 20px 14px;font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
+  .side-logo .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2b6de8,#4c8dff);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+  .side-nav{flex:1;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:#4a5568;
+    font-size:14px;font-weight:500;cursor:pointer;border:0;background:none;text-align:left;width:100%}
+  .nav-item:hover{background:#f1f4fa}
+  .nav-item.active{background:var(--brand-soft);color:var(--brand-d);font-weight:700}
+  .nav-item .ic{width:19px;text-align:center;font-size:15px}
+  .nav-item .tag{margin-left:auto;font-size:11px;background:#eef1f6;border-radius:99px;padding:1px 8px;color:var(--muted)}
+  .nav-sep{height:1px;background:var(--line);margin:10px 4px}
+  .side-user{padding:14px 16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c9cf5,#4c8dff);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+  .side-user .uname{font-size:13px;font-weight:600}
+  .side-user .uplan{font-size:11px;color:var(--muted)}
+  .side-user .logout{margin-left:auto;background:none;border:0;color:var(--muted);font-size:17px;cursor:pointer}
+  .side-user .logout:hover{color:var(--bad)}
+
+  main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:4}
+  .topbar .crumb{font-size:15px;font-weight:700}
+  .topbar .crumb span{color:var(--muted);font-weight:400;margin:0 6px}
+  .topbar .spacer{flex:1}
+  .searchbox{display:flex;align-items:center;gap:8px;background:#f2f4f9;border:1px solid var(--line);
+    border-radius:10px;padding:7px 12px;width:240px}
+  .searchbox input{border:0;background:none;outline:none;font-size:13px;width:100%}
+  .top-credit{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .top-credit b{color:var(--text)}
+  .page{padding:26px 28px 60px;max-width:1180px;width:100%;margin:0 auto}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px}
+  .page-head h2{margin:0;font-size:21px;font-weight:800}
+  .page-head .sub{color:var(--muted);font-size:13px;margin-top:3px}
+
+  /* ---------- 创作台：对话 + 进度 ---------- */
+  .create-grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+  @media(max-width:980px){.create-grid{grid-template-columns:1fr}}
+  .chat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    display:flex;flex-direction:column;height:calc(100vh - 150px);min-height:520px;overflow:hidden}
+  .chat-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .chat-head b{font-size:14px}
+  .chat-head .sub{font-size:12px;color:var(--muted)}
+  .chat-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;background:#fbfcfe}
+  .msg{display:flex;gap:10px;max-width:88%}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .msg .bubble{padding:11px 14px;border-radius:14px;font-size:14px;white-space:pre-wrap}
+  .msg.ai .bubble{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
+  .msg.user .bubble{background:var(--brand);color:#fff;border-top-right-radius:4px}
+  .msg .mini-avatar{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+  .msg.ai .mini-avatar{background:linear-gradient(135deg,#2b6de8,#4c8dff)}
+  .msg.user .mini-avatar{background:#93a4bd}
+  .stage-inline{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:9px 12px;margin-top:8px;font-size:13px}
+  .stage-inline .pill{margin-left:auto}
+  .sugg-row{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;border-top:1px solid var(--line);background:#fff}
+  /* 创作模式开关：默认完整出片，勾选 = 只跑创意 */
+  .mode-switch{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .mode-switch input{display:none}
+  .switch-track{width:38px;height:20px;border-radius:10px;background:#c3cddd;position:relative;transition:background .2s;flex:none}
+  .switch-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .mode-switch input:checked + .switch-track{background:var(--brand)}
+  .mode-switch input:checked + .switch-track .switch-thumb{left:20px}
+  .mode-switch b{font-size:12px;color:#3a4256}
+  .sugg{font-size:12px;color:var(--brand-d);background:var(--brand-soft);border:1px solid #c9dcfb;
+    border-radius:99px;padding:5px 12px;cursor:pointer}
+  .sugg:hover{background:#dbe8fd}
+  .chat-input{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-top:1px solid var(--line);background:#fff}
+  .chat-input textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;
+    resize:none;height:56px;outline:none;color:#18202f;caret-color:#2b6de8;line-height:1.6;background:#fafcff;
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif}
+  .chat-input textarea::placeholder{color:#8b96a8;font-size:13.5px}
+  .chat-input textarea:focus{border-color:var(--brand);background:#fff}
+  .chat-input .btn{width:100%;padding:0 20px;height:44px;border-radius:10px;font-size:15px}
+  .chat-input .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* 进度面板 */
+  .progress-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    display:flex;flex-direction:column;height:calc(100vh - 150px);min-height:520px;overflow:hidden}
+  .prog-head{padding:15px 18px;border-bottom:1px solid var(--line)}
+  .prog-head .row{display:flex;align-items:center;gap:8px}
+  .prog-head b{font-size:14px}
+  .prog-head .jobid{font-size:11px;color:var(--muted);font-family:ui-monospace,Consolas,monospace}
+  .prog-head .meta{display:flex;gap:14px;margin-top:10px;font-size:12px;color:var(--muted)}
+  .prog-head .meta b{color:var(--text)}
+  .prog-body{flex:1;overflow-y:auto;padding:8px 6px}
+  .stage-row{display:flex;gap:12px;padding:10px 14px;border-radius:10px;position:relative}
+  .stage-row::before{content:"";position:absolute;left:29px;top:44px;bottom:-14px;width:2px;background:var(--line)}
+  .stage-row:last-child::before{display:none}
+  .stage-row .sdot{width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;background:#edf0f5;color:#9aa5b8;z-index:1}
+  .stage-row.done .sdot{background:var(--ok);color:#fff}
+  .stage-row.done::before{background:var(--ok)}
+  .stage-row.running .sdot{background:var(--run);color:#fff;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,133,30,.35)}50%{box-shadow:0 0 0 6px rgba(232,133,30,0)}}
+  .stage-row .sinfo{flex:1;min-width:0}
+  .stage-row .sinfo .t{font-size:13px;font-weight:600}
+  .stage-row .sinfo .d{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .stage-row .sinfo .artifact{font-size:11px;color:#4a6fc0;background:var(--brand-soft);border-radius:6px;
+    padding:1px 7px;margin-top:5px;display:inline-block;font-family:ui-monospace,Consolas,monospace}
+  .stage-row .st{margin-left:auto}
+  .pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
+  .pill.done{background:var(--ok-soft);color:var(--ok)}
+  .pill.running{background:var(--run-soft);color:var(--run)}
+  .pill.wait{background:#eef1f6;color:#8a94a6}
+  .pill.failed{background:var(--bad-soft);color:var(--bad)}
+  .prog-foot{padding:13px 18px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;background:#fff}
+  .prog-foot .meter{flex:1;height:8px;border-radius:99px;background:#edf0f5;overflow:hidden}
+  .prog-foot .meter i{display:block;height:100%;background:linear-gradient(90deg,#2b6de8,#4c8dff);border-radius:99px;transition:width .5s}
+  .prog-foot .pct{font-size:12px;font-weight:700;color:var(--brand-d);width:40px;text-align:right}
+  .empty-prog{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--muted);gap:8px;text-align:center;padding:30px}
+  .empty-prog .big{font-size:34px}
+
+  /* ---------- 作品卡片 ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .wcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow);transition:.15s}
+  .wcard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(20,32,60,.12)}
+  .thumb{aspect-ratio:16/10;position:relative;background:linear-gradient(140deg,#dbe6fd,#e9f0fe);display:flex;
+    align-items:center;justify-content:center;font-size:30px;overflow:hidden}
+  .thumb img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .thumb .play{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.18);color:var(--brand);
+    font-size:15px;opacity:0;transition:.15s;z-index:2}
+  .wcard:hover .thumb .play{opacity:1}
+  .wcard .badge-top{position:absolute;top:10px;left:10px;z-index:3}
+  .wcard .wbody{padding:12px 14px 14px}
+  .wcard .wt{font-size:14px;font-weight:700;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wcard .wm{font-size:12px;color:var(--muted);display:flex;gap:10px;margin-bottom:10px}
+  .wcard .wops{display:flex;gap:8px}
+  .wcard .wops .btn{flex:1;padding:7px 0;font-size:12.5px;border-radius:8px}
+  .thumbs-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#fff;background:rgba(0,0,0,.35);
+    border-radius:6px;padding:2px 8px}
+
+  /* ---------- 广场 ---------- */
+  .gallery-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+  .g-tab{padding:7px 16px;border-radius:99px;font-size:13px;font-weight:600;border:1px solid var(--line);
+    background:#fff;color:#4a5568}
+  .g-tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .gcard .thumb{height:150px}
+  .gcard .author{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .gcard .author .avatar{width:26px;height:26px;font-size:11px}
+  .gcard .author .an{font-size:12.5px;font-weight:600}
+  .gcard .author .al{font-size:11px;color:var(--muted)}
+  .gcard .stats{display:flex;gap:14px;margin-top:8px;font-size:12px;color:var(--muted)}
+  .gcard .stats span{display:flex;align-items:center;gap:4px}
+  .btn-like{background:none;border:0;font-size:13px;color:var(--muted);padding:2px 6px;border-radius:8px}
+  .btn-like:hover{color:var(--bad)}
+  .btn-like.liked{color:var(--bad)}
+
+  /* ---------- 设置 ---------- */
+  .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:900px){.set-grid{grid-template-columns:1fr}}
+  .set-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+  .set-card h3{margin:0 0 4px;font-size:15px;font-weight:700}
+  .set-card .sub{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+  .key-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .key-row:last-child{border-bottom:0}
+  .key-row .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .key-row .dot.on{background:var(--ok)} .key-row .dot.off{background:var(--bad)}
+  .key-row .ki{flex:1;min-width:0}
+  .key-row .ki b{font-size:13px}
+  .key-row .ki span{display:block;font-size:11.5px;color:var(--muted)}
+  .key-row input{width:150px;flex:none;padding:6px 9px;border:1px solid var(--line);border-radius:8px;font-size:12px}
+  .key-row input:disabled{background:#f4f6fa;color:#9aa5b8}
+  .key-row .status{font-size:11px;font-weight:600;flex:none;width:52px;text-align:right}
+  .status.ok{color:var(--ok)} .status.miss{color:var(--bad)}
+  .plan-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line)}
+  .plan-row .tag-plan{font-size:11px;font-weight:700;background:var(--brand-soft);color:var(--brand-d);
+    border-radius:8px;padding:3px 10px}
+  .plan-row .pr{flex:1}
+  .plan-row .pr b{font-size:13.5px}
+  .plan-row .pr span{display:block;font-size:12px;color:var(--muted)}
+  .bill{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap}
+  .bill div{flex:1;min-width:120px;background:#f7f9fc;border:1px solid var(--line);border-radius:10px;padding:11px 14px}
+  .bill div b{display:block;font-size:17px}
+  .bill div span{font-size:11.5px;color:var(--muted)}
+
+  /* ---------- toast ---------- */
+  #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:#1d2735;color:#fff;padding:11px 22px;border-radius:10px;font-size:13.5px;z-index:99;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);transition:.3s;opacity:0;pointer-events:none}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+  /* ---------- 模板市场 ---------- */
+  .tpl-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow);transition:.15s;display:flex;flex-direction:column}
+  .tpl-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(20,32,60,.12)}
+  .tpl-body{padding:13px 15px 15px;display:flex;flex-direction:column;flex:1}
+  .tpl-body .tt{font-size:14.5px;font-weight:700;margin:0 0 3px}
+  .tpl-body .td{font-size:12px;color:var(--muted);flex:1;margin-bottom:10px;line-height:1.5}
+  .tpl-body .tmeta{display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap}
+  .tpl-meta{font-size:11px;background:#f2f4f9;color:#4a5568;border-radius:6px;padding:2px 8px}
+
+  /* ---------- Modal ---------- */
+  .modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:80;display:none;
+    align-items:center;justify-content:center;padding:20px}
+  .modal-mask.show{display:flex}
+  .modal{background:#fff;border-radius:16px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.25);
+    overflow:hidden;animation:pop .18s ease}
+  @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  .modal-head b{font-size:15px}
+  .modal-head .x{margin-left:auto;background:none;border:0;font-size:18px;color:var(--muted);cursor:pointer}
+  .modal-body{padding:18px 20px;max-height:60vh;overflow-y:auto}
+  .modal-foot{padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fafbfd}
+  .ratio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .ratio-opt{border:1.5px solid var(--line);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;background:#fff;transition:.12s}
+  .ratio-opt:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .ratio-opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+  .ratio-opt .shp{width:auto;height:34px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+  .ratio-opt .shp i{display:block;border:2px solid var(--brand);border-radius:4px;background:#c9dcfb}
+  .ratio-opt .rn{font-size:12px;font-weight:700}
+  .ratio-opt .rd{font-size:10.5px;color:var(--muted)}
+  .title-cand{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px;cursor:pointer;transition:.12s;background:#fff}
+  .title-cand:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .title-cand.sel{border-color:var(--brand);background:var(--brand-soft)}
+  .title-cand .tn{font-size:13.5px;font-weight:600}
+  .title-cand .ts{font-size:11px;color:var(--muted);margin-top:2px}
+  .cover-row{display:flex;gap:10px;margin:12px 0}
+  .cover-opt{flex:1;aspect-ratio:16/10;border-radius:8px;border:1.5px solid var(--line);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:20px;position:relative}
+  .cover-opt.sel{border-color:var(--brand);outline:2px solid #bfdbfe}
+  .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag-chip{font-size:11px;background:#f2f4f9;border:1px solid var(--line);border-radius:99px;padding:3px 10px;color:#4a5568}
+  .field-label{font-size:12px;font-weight:700;margin:12px 0 6px;color:#3a4256}
+
+  /* ---------- 模板市场（增强） ---------- */
+  .tpl-toolbar{display:flex;gap:14px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  .tpl-search{display:flex;align-items:center;gap:8px;flex:1;min-width:240px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:4px 14px;box-shadow:var(--shadow)}
+  .tpl-search input{flex:1;border:0;outline:0;font-size:13.5px;padding:8px 0;background:transparent}
+  .tpl-count{font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .tpl-head{aspect-ratio:16/8.5;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .tpl-head .tpl-emoji{font-size:54px;filter:drop-shadow(0 6px 14px rgba(30,50,90,.25));transform:translateY(-2px)}
+  .tpl-head .tpl-cat{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.82);color:#3a4256;
+    font-size:11px;font-weight:700;border-radius:99px;padding:3px 10px;backdrop-filter:blur(4px)}
+  .tpl-head .tpl-hot{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#ff8a3d,#ff5d3a);
+    color:#fff;font-size:10.5px;font-weight:700;border-radius:99px;padding:3px 9px;box-shadow:0 2px 8px rgba(255,93,58,.4)}
+  .tpl-body .tt-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .tpl-body .tt{font-size:14.5px;font-weight:700;margin:0 0 3px}
+  .tpl-body .tpl-est{font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .tpl-body .tneed{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .tpl-need{font-size:10.5px;background:#eef3fe;color:#3d63b8;border-radius:6px;padding:2px 7px}
+  .tpl-cta{display:flex;gap:8px}
+  .tpl-cta .btn-gen{flex:1.4;padding:8px 6px;border:0;border-radius:8px;background:var(--brand);color:#fff;
+    font-size:13px;font-weight:600;cursor:pointer}
+  .tpl-cta .btn-gen:hover{background:var(--brand-d)}
+  .tpl-cta .btn-edit{flex:1;padding:8px 6px;border:1px solid var(--line);border-radius:8px;background:#fff;
+    color:#4a5568;font-size:13px;font-weight:600;cursor:pointer}
+  .tpl-cta .btn-edit:hover{border-color:var(--brand);color:var(--brand)}
+
+  /* ---------- 账户中心 ---------- */
+  .acc-hero{display:flex;gap:22px;align-items:stretch;background:linear-gradient(135deg,#15233f,#24395f);
+    border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:14px;flex-wrap:wrap}
+  .acc-hero .ah-main{flex:1.3;min-width:230px}
+  .acc-hero .ah-label{font-size:12.5px;color:#a9b7d0;margin-bottom:2px}
+  .acc-hero .ah-balance{font-size:38px;font-weight:800;letter-spacing:.5px}
+  .acc-hero .ah-sub{font-size:11.5px;color:#8fa3c4;margin-top:2px}
+  .acc-hero .ah-stats{flex:1;display:flex;gap:14px;flex-wrap:wrap}
+  .acc-hero .ah-stats > div{flex:1;min-width:120px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;padding:13px 15px}
+  .acc-hero .ah-stats b{display:block;font-size:20px;font-weight:800}
+  .acc-hero .ah-stats span{font-size:11px;color:#a9b7d0}
+  .acc-note{font-size:12px;color:#6b7280;background:#f2f5fb;border:1px dashed #c6d2e8;border-radius:10px;
+    padding:9px 13px;margin-bottom:16px;line-height:1.6}
+  .acc-head{display:flex;align-items:baseline;gap:12px;margin:4px 0 12px}
+  .acc-head h3{margin:0;font-size:15px}
+  .acc-hint{font-size:11px;color:var(--muted)}
+  .acc-costs{display:flex;flex-direction:column;gap:10px}
+  .acc-cost{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;box-shadow:var(--shadow)}
+  .acc-cost .ac-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .acc-cost .ac-title{font-size:13.5px;font-weight:700;flex:1;min-width:160px}
+  .acc-cost .ac-pipe{font-size:11px;color:var(--muted)}
+  .acc-cost .ac-total{font-size:14px;font-weight:800;color:#15233f}
+  .acc-cost .ac-total .neg{color:#e11d48}
+  .acc-cost .ac-total .ok{color:var(--ok)}
+  .acc-cost .ac-lines{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .acc-cost .ac-line{font-size:11px;background:#f2f4f9;border:1px solid var(--line);border-radius:7px;padding:2px 9px;color:#4a5568}
+  .acc-cost .ac-line.hosted{background:#eef7ef;border-color:#cfe6d2;color:#177a3b}
+  .acc-cost .ac-foot{font-size:10.5px;color:#9aa5b8;margin-top:7px}
+  .rechar-row{display:flex;gap:8px;align-items:center}
+
+</style>
+</head>
+<body data-page-node-id="BFNO4fo1X9IEMbCpCuVxKQ">
+
+<!-- ============ 登录页 ============ -->
+<div id="loginView" data-page-node-id="Pe3HhO8J0oAKiaqa1vV81B">
+  <div class="login-left" data-page-node-id="RQM6Cl0uhQJWDHOoy6WPhQ">
+    <div class="logo" data-page-node-id="5S9jPzZdTvJALx5XjBLZLe"><span class="mark" style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center" data-page-node-id="CCnaRL7kQgVOFhypE3rdAU">OM</span> OpenMontage</div>
+    <h1 data-page-node-id="X2EVfqRRyLBt8Np54gmnHR">对话式视频创作平台<br data-page-node-id="bhPb407jaqj1erkqWvjHAu">一句话，生成你的视频</h1>
+    <p data-page-node-id="Ctx91fkwgQwv6WT8N4wR3x">用你自己的 API Key，在网页上与 AI 对话，自动完成选题、脚本、分镜、素材、剪辑到成片的全流程。</p>
+    <div class="feature-list" data-page-node-id="0aAPbQfvT6oANHFFRNX9b5">
+      <div data-page-node-id="L5bTJ8ao2LOD0a1Z8XaKxY"><span class="ic" data-page-node-id="uptFa11TSqGGVfSn2gIAA5">💬</span><span data-page-node-id="clR9tvpzcLxhZgwPtWBDVJ">对话式创作：描述想法，AI 逐阶段推进并实时汇报进度</span></div>
+      <div data-page-node-id="EslYGwQb59IuiI0Mx3DW9J"><span class="ic" data-page-node-id="WYx0KlAEhoTrxdc4mKdrLo">🔑</span><span data-page-node-id="a9HC7O6CK5U0ZG1SkcdysL">BYOK：填自己的 Key，用量和成本自己掌控</span></div>
+      <div data-page-node-id="RCE1y6GOpEXFiJJ2q9CMix"><span class="ic" data-page-node-id="pYFErvXbbwFTSHyuIBxhGL">🛡️</span><span data-page-node-id="uFy6qDD3NugfigCzb3KeMS">多用户隔离：你的项目、Key、作品仅自己可见</span></div>
+      <div data-page-node-id="ZcucYwzXeCvWwlNGYEto3K"><span class="ic" data-page-node-id="nR9pAoaWjy4OQxhTczqzJR">🎪</span><span data-page-node-id="1UhT3nsRkt8Drx6fxSVlrH">公共广场：一键发布作品，展示给所有人</span></div>
+    </div>
+  </div>
+  <div class="login-right" data-page-node-id="i8TSNOAXb5ltjGBxWaxOaF">
+    <div class="login-card" data-page-node-id="4Pxu8hGtWljQAoDlQ0Obme">
+      <h2 id="loginTitle" data-page-node-id="3MSwIIGoq1lj8jqhLEP6Dm">欢迎回来</h2>
+      <p class="sub" id="loginSub" data-page-node-id="RjbfC6miMi4yBDY983PLWn">登录你的 OpenMontage 账户</p>
+      <form id="loginForm" onsubmit="doLogin(event)" data-page-node-id="HCZom5k831DwHQnmFNiYaC">
+        <div class="field" id="nameField" style="display:none" data-page-node-id="qS3y88Y6WlacOrAc2wiuUx">
+          <label data-page-node-id="eEEZD5de0KPhEpTR3oMQFd">昵称</label>
+          <input id="regName" placeholder="你的昵称" data-page-node-id="QwMJvMMFyVGegdSxNSrHOV">
+        </div>
+        <div class="field" data-page-node-id="CqcGfKCSlzeoIf20oYAomt">
+          <label data-page-node-id="ebeQC8ycWpKSbIkT2AYQ0X">邮箱</label>
+          <input id="loginEmail" type="email" placeholder="you@example.com" value="demo@openmontage.dev" data-page-node-id="0fEUHigUZZF4yqDXUuJew0">
+        </div>
+        <div class="field" data-page-node-id="PhM9unYTE8VgVMYvlsysKH">
+          <label data-page-node-id="fkyHeAKSGtE5yCcyx8vnUC">密码</label>
+          <input id="loginPwd" type="password" placeholder="••••••••" value="demo1234" data-page-node-id="NZY9uguZRTpl1bim3tUj1O">
+        </div>
+        <button class="btn btn-primary" id="loginBtn" type="submit" data-page-node-id="mPGH4kCiNPffLk7XATB9Yt">登 录</button>
+      </form>
+      <div class="divider" data-page-node-id="ovSnk5BlgOYtq1fBadEytj">或</div>
+      <div class="social-row" data-page-node-id="WHKt1B9tqH5YhLHdgs7QyJ">
+        <button class="btn btn-ghost btn-sm" style="flex:1" data-page-node-id="8TDC8zBst7ItZ0NBVpDJgX">微信</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" data-page-node-id="SV6OtS2ZJG80WsMA1eRwLG">GitHub</button>
+      </div>
+      <div class="login-switch" data-page-node-id="R943LEKYQPclcLr7C8aSGU"><span id="switchText" data-page-node-id="gwRT7Cn403f5tDC3UHMIGB">还没有账户？</span><a href="#" id="switchLink" onclick="toggleAuth(event)" data-page-node-id="V3kxNiNNgNKAoxzi5Uu7Mc">立即注册</a></div>
+      <div class="demo-hint" data-page-node-id="WuCI7qcxTfeK0txtsxxj2H">💡 <b data-page-node-id="C5rWGNcMRUbe7tfUFeRGPH">原型演示</b>：点「登录」直接进入。可切换「注册」流程查看。多用户隔离已模拟：切换账户后，作品与 Key 互不可见。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 主应用 ============ -->
+<div id="appView" class="hidden" data-page-node-id="LsGKIXQobD1t1sySDrrDfW">
+  <aside data-page-node-id="VKy5mwGU9U9gCnXeyMwJJT">
+    <div class="side-logo" data-page-node-id="00w1urkoywW0gvVJHZt6wJ"><span class="mark" data-page-node-id="YDGFVO8C0AQlYntquAs0Ej">OM</span> OpenMontage</div>
+    <nav class="side-nav" data-page-node-id="3Lb4bdTnopqi4DGMrGsPmi">
+      <button class="nav-item active" data-page="create" data-page-node-id="VVQVe1c4e93JkcPAa14tJE"><span class="ic" data-page-node-id="bfNmggj5sTM9Tu4CCsBrET">✨</span>创作台<span class="tag" data-page-node-id="eWXd5tfBnuX38cHAJ58uGZ">核心</span></button>
+      <button class="nav-item" data-page="templates" data-page-node-id="BTxwCHTtISGidvNzGYwmGt"><span class="ic" data-page-node-id="AUYhYzCXo2WQ54Ykiijx3F">🧩</span>模板市场</button>
+      <button class="nav-item" data-page="works" data-page-node-id="jeTnsOTHvxCb2rldfG7qMd"><span class="ic" data-page-node-id="XIsGEbxngDzE3bRWZNqhmN">🎬</span>我的作品</button>
+      <button class="nav-item" data-page="gallery" data-page-node-id="g9D9ZWtI0DmtksimYjH2Uj"><span class="ic" data-page-node-id="cEw1WlJpat6CXu6gzvlIWI">🎪</span>公共广场</button>
+      <button class="nav-item" data-page="board" data-page-node-id="ZNF2UVlFcBE2hF9kGFqDN3"><span class="ic" data-page-node-id="MMyi3z0vtnog2rMJz0SGCd">📊</span>任务看板</button>
+      <button class="nav-item" data-page="tools" data-page-node-id="VhytNjDCBemkayv8PThbD0"><span class="ic" data-page-node-id="dxXoEMEvFxvi7EHKJ6Dg7B">🛠️</span>服务器工具状态</button>
+      <button class="nav-item" data-page="account" data-page-node-id="xEXsVMoWAjwYsPPM60i9di"><span class="ic" data-page-node-id="V0IYr76sNw9xHBFpDlRHe7">💳</span>账户中心</button>
+      <button class="nav-item" data-page="settings" data-page-node-id="KeYAXtikDYwXMFDSYiXfpr"><span class="ic" data-page-node-id="8E0HjLSkxrtDc0qzQr52cg">🔑</span>API Keys 配置</button>
+    </nav>
+    <div class="side-user" data-page-node-id="BuNwahzNRo6YrHzy7xCJhs">
+      <div class="avatar" id="sideAvatar" data-page-node-id="fqW4WXAfPSkTOQT2noswSb">纲</div>
+      <div data-page-node-id="bYvHD9IZWd3QNRnFFWwJkE">
+        <div class="uname" id="sideName" data-page-node-id="PkXlwApHJKdHaGqhkGElK9">纲哥</div>
+        <div class="uplan" id="sideBalance" onclick="goto('account')" style="cursor:pointer" title="查看账户中心" data-page-node-id="WEew2LUHHIeeo90am8mRLC">托管余额 ¥— · 点击查看</div>
+      </div>
+      <button class="logout" onclick="logout()" title="退出登录" data-page-node-id="0HYNcTl4BkazKGta9hhsjC">⎋</button>
+    </div>
+  </aside>
+
+  <main data-page-node-id="1pIA8EFfvz8PaiRH8anW9m">
+    <div class="topbar" data-page-node-id="WgJjl33GOBGx3zx4ufabKp">
+      <div class="crumb" id="crumb" data-page-node-id="SdHRpYQ9ANkymRDhji8XCZ">创作台</div>
+      <div class="spacer" data-page-node-id="YuKVL5PzgIxMzDb6UmAA21"></div>
+      <div class="searchbox" data-page-node-id="3Ciq7hEDHg2DBJvWnZXyMY">🔍 <input placeholder="搜索我的项目 / 广场作品…" data-page-node-id="ELvAJVZXuAJGKBaZlwH6pW"></div>
+      <div class="top-credit" data-page-node-id="WEVfsrHpHqGUuXTLJyiHTe">💳 托管余额 <b id="topBalance" data-page-node-id="zF4RiKW0EN454dcMQNhRje">¥—</b></div>
+      <span id="apiBadge" class="badge warn" style="font-size:11px" data-page-node-id="DF3OGuP3G3UC0VaKE6vdWK">检测中…</span>
+    </div>
+
+    <!-- ============ 创作台 ============ -->
+    <section id="page-create" class="page" data-page-node-id="IgNPSHLmFW7TCy7SBMtj0R">
+      <div class="page-head" data-page-node-id="PNHbAoZohBgQDPw6KEsoBF">
+        <div data-page-node-id="9g6Zsf0qQ6jm0rhR1EUEU9"><h2 data-page-node-id="wCRUaOpLo1YKm0S5EIZXnz">创作台</h2><div class="sub" data-page-node-id="Ktnj9DnEXoP46kY5vaM8Xn">用对话描述你想做的视频，AI 会按流水线逐步制作，并在右侧实时显示进度。</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="goto('settings')" data-page-node-id="tid38jUHUBzmgFCW8AFfph">⚙️ 检查 API Key 配置</button>
+      </div>
+      <div class="create-grid" data-page-node-id="XeyZmN6ieTHaDrapEy7DkE">
+        <div class="chat-card" data-page-node-id="KvGiI6PhoSxlZPTH6zfnDU">
+          <div class="chat-head" data-page-node-id="D5mwe3NhRF8jaBzYpFBj0m">
+            <div class="avatar" style="width:28px;height:28px;font-size:12px" data-page-node-id="xIGwIrTvKfKezrfg6gDjI9">OM</div>
+            <div data-page-node-id="nWTyK8LzYuxYqdEFM3C3qI"><b data-page-node-id="JU8kMgttomKnVej0BHqaw5">Monty 创作助手</b> <span class="sub" data-page-node-id="fg72v7KVTIiOA9YQJTRsxc">· 已连接你的 Key（BYOK）</span></div>
+          </div>
+          <div class="chat-body" id="chatBody" data-page-node-id="tBLK3xM0uV6xoyicrRrTVt">
+            <div class="msg ai" data-page-node-id="25JIwdoeivXH7SOIY68MWH">
+              <div class="mini-avatar" data-page-node-id="F1sdqvuQoCUHViHI1UzRGc">OM</div>
+              <div class="bubble" data-page-node-id="vuZn6koV84jq4PxErnMda5">你好，纲哥！👋 告诉我你想做什么视频，我来安排：
+<b data-page-node-id="BvCAIirHEMOzjV6vlhMeFI">· 主题</b>：讲什么内容？
+<b data-page-node-id="M7T5vmcVxariz2lX12xTbJ">· 风格</b>：动画 / 真人 / 屏幕演示 / 纪录片…
+<b data-page-node-id="qxS0MEEJz8Lm3qfHWgVEXd">· 时长</b>：30s / 60s / 90s…
+<br data-page-node-id="sqJXxz9mWAjjWFKZuK2DtR"><br data-page-node-id="Y1ou3RCB3AocaDHEQTG5Zs">也可以直接点下面的示例试试 👇</div>
+            </div>
+          </div>
+          <div class="sugg-row" data-page-node-id="tZiD8izbMlZgVl9y2KMLo3">
+            <span class="sugg" onclick="sendSugg(this)" data-page-node-id="4lH0AUFRbVF0UXLsXZpRUx">60秒动画：HTTP 与 HTTPS 的区别</span>
+            <span class="sugg" onclick="sendSugg(this)" data-page-node-id="CySCAF9xgnzLU8BGh4FPWK">90秒科普：海南清补凉为什么火</span>
+            <span class="sugg" onclick="sendSugg(this)" data-page-node-id="0GhXVJoDid0BawCCvrZTNE">30秒广告：新式茶饮开业</span>
+          </div>
+          <div class="sugg-row" style="border-top:0;padding-top:0" data-page-node-id="sy3toSx2U4ht1plBEoN1vi">
+            <span style="font-size:12px;color:var(--muted);align-self:center" data-page-node-id="ycpU8trZqk96XvROrTtY8D">流水线</span>
+            <select id="pipelineSel" style="flex:1" data-page-node-id="SKaQM7MBFTlcKP6dEs9zNC"></select>
+          </div>
+          <div class="sugg-row" style="border-top:0;padding-top:0;align-items:center" data-page-node-id="WXiiQ0x2fzjNs96yG4wJLD">
+            <input type="file" id="srcVideoInput" accept="video/*,.mp4,.mov,.mkv,.avi" style="display:none" data-page-node-id="xS8CukuSvB5uSpNbDnFeG5">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('srcVideoInput').click()" data-page-node-id="FNgBA1W6RcYG4Nx0bCZy6a">🎬 上传素材视频</button>
+            <span id="srcVideoState" style="font-size:11px;color:var(--muted)" data-page-node-id="oHyKiINGVaaqatv1vCg9kS">素材输入类流水线（长视频切片/播客转视频/录屏）可上传真实视频</span>
+          </div>
+          <div class="sugg-row" style="border-top:0;padding-top:0;align-items:center" data-page-node-id="FkoMYyQ0PKdJaY51mxbYgd">
+            <label class="mode-switch" title="完整出片 = LLM 写脚本 → APIz 出图 → TTS 配音 → ffmpeg 合成视频（约 5-7 分钟）" data-page-node-id="i6bNHPKP7piq8Df6GuGYjC">
+              <input type="checkbox" id="creativeOnly" data-page-node-id="SB1lQ1NgGv1ddz1UTEBvGs">
+              <span class="switch-track" data-page-node-id="4IZI2aquAHrSRffE7dbj0d"><span class="switch-thumb" data-page-node-id="EWiOAKMXyxoxBZJoXyFMsA"></span></span>
+              <b id="creativeOnlyLabel" data-page-node-id="AkMsaf38LXoyDAk71SXzJl">🎬 完整出片（约 5-7 分钟）</b>
+            </label>
+            <span style="font-size:11px;color:var(--muted)" data-page-node-id="EZCzuchyUU42OcExerCdMQ">勾选后变为「只跑创意阶段（快）」</span>
+          </div>
+          <div class="chat-input" data-page-node-id="VEBqF2UhLL45gECRXYsQsB">
+            <textarea id="chatInput" placeholder="输入你的视频主题，例如：用动画讲解海南清补凉为什么火" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+            <button class="btn btn-primary" id="sendBtn" onclick="sendMsg()" data-page-node-id="bIV8I9BHdZS4ZlbWXLvxXD">发送</button>
+          </div>
+        </div>
+
+        <div class="progress-card" data-page-node-id="Y48RcbImaj4AWVtlBcpIrX">
+          <div class="prog-head" data-page-node-id="XOU7uDqJWBglLAUUD1Diad">
+            <div class="row" data-page-node-id="TL5olVeTyNlFXW7p2Eijjl"><b data-page-node-id="FN41ppQHCkWwAkYDOkeC6P">📈 制作进度</b><span class="jobid" data-page-node-id="6mPbds1TD70WdJwLeUx3uN">job_cf3d31f81b7b</span></div>
+            <div class="meta" data-page-node-id="QNGLY9sNvyHvi6Y0uH68Qm"><span data-page-node-id="bbbtElH5xhfIR43VAdcU7Z">流水线 <b data-page-node-id="lh4R2qzgr4MNPNeOphq3AE">animated-explainer</b></span><span data-page-node-id="jIYL53JpqeNSiegZaUsoX7">风格 <b data-page-node-id="3Jg8Y6d1XsjQW65BkXjToS">clean-professional</b></span></div>
+          </div>
+          <div class="prog-body" id="progBody" data-page-node-id="9sbHqV1oxjDKRLbqi0c8PQ">
+            <div class="err hidden" id="runBlocker" style="margin:0 14px 6px;font-size:12px" data-page-node-id="DhAG44EZWyJedYMKdYDrZc"></div>
+            <div class="empty-prog" id="progEmpty" data-page-node-id="h5cwULDQTsHJH8eUWlRY3S">
+              <div class="big" data-page-node-id="mtRJHpPPiMzdaF4Hxey1IQ">🎬</div>
+              <div data-page-node-id="27DA9XUP9UZUtXGAM4kdEs">还没有进行中的任务</div>
+              <div style="font-size:12px" data-page-node-id="kg6KVm7Q2sDN4UeFnkzmos">在左侧对话中发送一条需求，即可开始</div>
+            </div>
+            <div id="stageList" style="display:none" data-page-node-id="wIjrDyxYXdGHDI2IBFgYug"></div>
+          </div>
+          <div class="prog-foot" data-page-node-id="prpWDMRcypiS7nUyTHDvGY">
+            <span style="font-size:12px;color:var(--muted)" data-page-node-id="AArQOBGDR96MPzH7zeyVND">总进度</span>
+            <div class="meter" data-page-node-id="dThxEBb8TBHvE64ykiqs7A"><i id="meterFill" style="width:0%" data-page-node-id="HhqN0mfdSy9YhdSw7Cpdx9"></i></div>
+            <span class="pct" id="meterPct" data-page-node-id="DeCKx9oIHetPU66vKtqRO0">0%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 模板市场 ============ -->
+    <section id="page-templates" class="page hidden" data-page-node-id="YffnHa8mkbB4OjrXlz9gEi">
+      <div class="page-head" data-page-node-id="OxmYEW0jwLd2Tgo9j66z2X">
+        <div data-page-node-id="y5OQxHTXePEJcR1P2hXdEb"><h2 data-page-node-id="F28vBwp2kQqym3bXgckmwk">模板市场</h2><div class="sub" data-page-node-id="QnhJcrM3b3xCp0ZaTkqfNK">每个模板对应一条真实 AI 流水线。选模板 → 填主题 → 一键出片；也可编辑后去创作台精调。</div></div>
+      </div>
+      <div class="tpl-toolbar" data-page-node-id="25n3eUkAqxFzoUuKz9vZNM">
+        <div class="tpl-search" data-page-node-id="JUDMHegV0nF6jHHAALNbyl">🔍<input id="tplSearch" placeholder="搜索模板：科普 / 动画 / 切片 / 字幕…" oninput="renderTemplates()" data-page-node-id="1UPX0NNfHgwNMAVyiDxk70"></div>
+        <span class="tpl-count" id="tplStat" data-page-node-id="bRDRBfndmI9sysRjoxGXJ4">—</span>
+      </div>
+      <div class="gallery-tabs" id="tplTabs" data-page-node-id="BGLFBJly6EAcCGnefuddFE">
+        <button class="g-tab active" data-page-node-id="u9WvtWuV7njAzJyEAAeLd8">全部</button>
+        <button class="g-tab" data-page-node-id="XD5yktRdhOHFug9N6QW3WY">📚 科普讲解</button>
+        <button class="g-tab" data-page-node-id="PlQs53I1ZwAYpdUJtQ4oI3">🎨 动画创作</button>
+        <button class="g-tab" data-page-node-id="gQ2dHWOGIZTgybxKTCGnNj">💻 屏幕演示</button>
+        <button class="g-tab" data-page-node-id="sjisAz51FdnRGfDqW3kAV8">✂️ 二次创作</button>
+        <button class="g-tab" data-page-node-id="5jmHMwSb3gEqPNFTRKpOj3">🌍 本地化</button>
+      </div>
+      <div class="grid" id="tplGrid" data-page-node-id="FjASq7nxm4kWEIMNpKrpHy"></div>
+    </section>
+
+    <!-- ============ 账户中心（真实成本对账 + 托管余额） ============ -->
+    <section id="page-account" class="page hidden" data-page-node-id="fNPSBTEMAYAOljGnbO58Jt">
+      <div class="page-head" data-page-node-id="AHoq5spS5DdWTFnAfF2Gf0">
+        <div data-page-node-id="4vc6NCHKqKERDoru2Equz7"><h2 data-page-node-id="fug6ELPHzl6fm8qvnGUbKZ">账户中心</h2><div class="sub" data-page-node-id="dpKXVKUOaGZOIDPh5q3K0e">托管余额：平台内置 Key 代付的生成费用从这里扣（真实按任务记账）；自己填了 Key 的部分直接走你的 Key，只记账不扣款。</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openRecharge()" data-page-node-id="PBeDI7MEsky8QiyWYVLavW">＋ 充值</button>
+      </div>
+      <div class="acc-hero" id="accHero" data-page-node-id="aQYGeBAVX1D0jK1UJOFfPY">
+        <div class="ah-main" data-page-node-id="DoN6nLzr7h5Z1mqqBwv43r">
+          <div class="ah-label" data-page-node-id="rZ8YLOtpW2YLF54oKnKhq6">托管余额（¥）</div>
+          <div class="ah-balance" id="accBalance" data-page-node-id="az86gRjj2uxGgEN259hdhD">—</div>
+          <div class="ah-sub" id="accBalanceUsd" data-page-node-id="cCtdQp0IKGx2w892GUrLgl">加载中…</div>
+        </div>
+        <div class="ah-stats" data-page-node-id="YZHyK2L0j7dXNKgV0fBIVb">
+          <div data-page-node-id="X9cl7WXFiTqFy7e83KRneA"><b id="accSpent" data-page-node-id="FEGaZ74YoKsUWdsNmmmAG6">—</b><span data-page-node-id="DH5ccea9zevvLjQhwnOjAQ">托管已消耗</span></div>
+          <div data-page-node-id="cATlA2GYqbuhPnFWaZ008f"><b id="accByok" data-page-node-id="E6qAiJjc24VAsbiOAjfMFB">—</b><span data-page-node-id="KvyHTadylOMEwiY47jotwV">自有 Key 消耗（不计费）</span></div>
+          <div data-page-node-id="W5JZ2VR17E0RCAuDYvJ2QS"><b id="accJobs" data-page-node-id="ksbTeXnDpVw9r0JeVXNTkL">—</b><span data-page-node-id="8IUIRzHWOVcl4bnUfKpEy9">任务数</span></div>
+        </div>
+      </div>
+      <div class="acc-note" id="accNote" data-page-node-id="PYbpH56MSdWvqswmKHLxeq"></div>
+      <div class="acc-head" data-page-node-id="RzVqtIbgO43gH1zewe5qE0"><h3 data-page-node-id="sjEMn6nmM7BIgHHri1JXxT">🧾 任务成本明细（真实计量 · 资产生成阶段）</h3><span class="acc-hint" data-page-node-id="4wk1zd3siDPLvxeD5DlyLF">创意阶段 LLM 走服务器配额，暂未逐条计量</span></div>
+      <div id="accCosts" class="acc-costs" data-page-node-id="IwV42sfSMLOBrcYGWvGxhU"><p class="cap-hint" data-page-node-id="p3T8lv8mb2q58O3bPu3LTQ">加载中…</p></div>
+    </section>
+
+    <!-- ============ 我的作品 ============ -->
+    <section id="page-works" class="page hidden" data-page-node-id="dC8OthggGJPZxHGhicbhAi">
+      <div class="page-head" data-page-node-id="3iWh79jy4iPr0sqsJksLh0">
+        <div data-page-node-id="3Y4U2VDJ87aeu2FFnukxHP"><h2 data-page-node-id="ahQzD2PoXTHRuAtJOxw6VB">我的作品</h2><div class="sub" data-page-node-id="Vo7ENlj1NATgqTFA9Fr6Ao">仅自己可见。可发布到公共广场展示。</div></div>
+        <button class="btn btn-primary btn-sm" onclick="goto('create')" data-page-node-id="I5PcjbDV1KVQXJI2aPH0Xb">＋ 新建视频</button>
+      </div>
+      <div class="grid" id="myWorksGrid" data-page-node-id="LCWoKAAc2vsBDb6kx2l1rO"></div>
+    </section>
+
+    <!-- ============ 公共广场 ============ -->
+    <section id="page-gallery" class="page hidden" data-page-node-id="eiQhlc9rpbcNNHZXeDL0UY">
+      <div class="page-head" data-page-node-id="ccTkXttkq5GOTcKcguD1Mt">
+        <div data-page-node-id="TZsY1pAGxybbiLmuEKJCSZ"><h2 data-page-node-id="f1FAZHwImd4IIOWRnHZqek">公共广场</h2><div class="sub" data-page-node-id="wjbvsoF3NmczOmFZj5QkNq">来自所有用户的公开作品 · 仅已发布可见</div></div>
+        <button class="btn btn-primary btn-sm" onclick="goto('works')" data-page-node-id="l9vufh5S6JWEbc4T6FBX7m">发布我的作品</button>
+      </div>
+      <div class="gallery-tabs" id="galleryTabs" data-page-node-id="Qzq6dvWhOuJkwqhCAXSMNa">
+        <button class="g-tab active" data-page-node-id="EbZf0mOnLGjSTvSpLeC6gc">🔥 热门</button>
+        <button class="g-tab" data-page-node-id="J1krdMC5BJHs1poOcc4EyX">🆕 最新</button>
+        <button class="g-tab" data-page-node-id="SMe4fZ75YkodyNaBUJLNPM">📚 科普</button>
+        <button class="g-tab" data-page-node-id="bwW86uaFHTBSN9Ajga4boK">🎨 动画</button>
+        <button class="g-tab" data-page-node-id="I0s998Qf2JZF2BByS6B4De">💼 商业</button>
+      </div>
+      <div class="grid" id="galleryGrid" data-page-node-id="bJkI1Px7SJLY03FdHHv8Ix"></div>
+    </section>
+
+    <!-- ============ API Keys ============ -->
+    <section id="page-settings" class="page hidden" data-page-node-id="S1IcRGwlcduRrZPdW4wVtZ">
+      <div class="page-head" data-page-node-id="6QGDkCVTDnvcAj0mvd5AxH">
+        <div data-page-node-id="xHDixLjfWnNIA0ZGdxpB6j"><h2 data-page-node-id="ynM21JWWUsy2ZfE1mFOFqg">API Keys 配置</h2><div class="sub" data-page-node-id="x8idubNHsF1Am9DmFT0LFg">填入你自己的服务商 Key（BYOK）。Key 加密存储、仅你自己可见，绝不对外暴露。</div></div>
+        <button class="btn btn-primary btn-sm" onclick="toast('配置已保存（原型演示）')" data-page-node-id="kwrsdUSEVlK3hqEFckTCU7">💾 保存全部</button>
+      </div>
+      <div class="set-grid" id="keysRoot" data-page-node-id="cKHlPN0XOKPfztv8BKQ8Rf"></div>
+    </section>
+
+    <!-- ============ 服务器工具状态 ============ -->
+    <section id="page-tools" class="page hidden" data-page-node-id="J9KXPlXERH4gLd4PqMMBmB">
+      <div class="page-head" data-page-node-id="5pHMibLFSr6CjgmBp1cCb5">
+        <div data-page-node-id="knO6oNibNoZkEHOg4YlQnF"><h2 data-page-node-id="JDAVmPngjqjj5X4Ul1kbWL">服务器工具状态</h2><div class="sub" data-page-node-id="1mKdIPaNXLsr8QRdeP7zkI">各能力分组下已配置的工具（来自 /api/tools 实时探测，缓存 5 分钟）</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="renderToolsPage()" data-page-node-id="E48wWnzs3RV8ZEGJQN6BHz">🔄 重新探测</button>
+      </div>
+      <div class="set-grid" id="toolsRoot" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px" data-page-node-id="MHyI6Db7aGNu6L7W4wwQXY"></div>
+    </section>
+
+    <!-- ============ 任务看板（整合 /board/） ============ -->
+    <section id="page-board" class="page hidden" data-page-node-id="v84ClYL4UKR3EPLoq9tZ2r">
+      <div class="page-head" data-page-node-id="rVoURanX61HfFefwCdaHRD">
+        <div data-page-node-id="9dFezfLKRLqYQjMV3sdlVB"><h2 data-page-node-id="110qP0A6nSw28BohvLWdjD">任务看板</h2><div class="sub" data-page-node-id="SW6w30BqHBnm6fdwFOAa8S">所有生成任务与 8 阶段进度实时监控（每 5 秒自动刷新）</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="renderBoard(true)" data-page-node-id="qSzgYS8yXvhEG7zgtCSIX0">🔄 立即刷新</button>
+      </div>
+      <div id="boardRoot" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px" data-page-node-id="8EYFvNauMuO9K23I9nDlcN"></div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" data-page-node-id="fJEymwdrvUfG1QLMaCESc3"></div>
+
+<!-- ===== 托管充值 Modal（测试通道） ===== -->
+<div class="modal-mask" id="recharMask" data-page-node-id="kFhfRyVYDVNwQu7DpZc15D">
+  <div class="modal" data-page-node-id="7mCFK8XpdACHfDvMJRTSlf">
+    <div class="modal-head" data-page-node-id="uKtrSPV6tjpM3C9YxQ5usN"><b data-page-node-id="gZeDLr4NYpfMyeKKw2IHIb">💳 托管余额充值</b><button class="x" onclick="closeRecharge()" data-page-node-id="8bVmXlu9pg7URZaCAqMCW8">✕</button></div>
+    <div class="modal-body" data-page-node-id="wYMRByiA8F4V74YdJPvKHT">
+      <p class="sub" style="margin:0 0 12px" data-page-node-id="26QZqAJN1r1Bw2vpH8tIzt">托管余额用于抵扣<b data-page-node-id="dJ6u082G1kYIKRsMhR2zf2">平台内置 Key</b> 代付的生成费用（通义配音 / 生图 / 免费素材等）。自带 Key 的用户不需要充值。</p>
+      <div class="field-label" data-page-node-id="vSs9qOOVSr07EvSN07Y1IP">充值金额（¥）</div>
+      <div class="rechar-row" data-page-node-id="m9PGxTOdzJXI0ZeH4aghTw">
+        <input id="recharInput" type="number" min="1" step="1" style="flex:1;border:1px solid var(--line);border-radius:9px;padding:10px 13px;font-size:15px;outline:none" data-page-node-id="haOgr66sqnZI0i4sOaNKYt">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('recharInput').value='10'" data-page-node-id="SsImVISxb93FjJKpZMzKHb">¥10</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('recharInput').value='50'" data-page-node-id="R5DdumHGwdcpQ2tO5099ar">¥50</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('recharInput').value='100'" data-page-node-id="qhxwtnTNgmP5He7rl7Bg5R">¥100</button>
+      </div>
+      <div class="cap-hint" style="margin-top:8px" data-page-node-id="TiuD7Cv1geq5FXoS2AW1Gk">⚠️ 当前为<b data-page-node-id="I6cUdtdnWR7bi1cRB3vdBX">测试通道</b>（模拟入账）。正式支付（微信/支付宝）对接中，测试金额仅用于体验「充值 → 跑任务 → 扣费对账」闭环。</div>
+    </div>
+    <div class="modal-foot" data-page-node-id="vQYzrJfQ428lOZLDEIil2u">
+      <button class="btn btn-ghost btn-sm" onclick="closeRecharge()" data-page-node-id="3BYD8HpXSAPRC2fvHiSf3s">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="rechargeSubmit()" data-page-node-id="wIKtPDb79EuckiTOVzp3lb">确认充值</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 多比例导出 Modal ===== -->
+<div class="modal-mask" id="exportMask" data-page-node-id="rn3bJF7fUV3NQFuI3lf8yN">
+  <div class="modal" data-page-node-id="zuCu3EMMopxdoKFyL3sCaR">
+    <div class="modal-head" data-page-node-id="i9iOGgNrVLWxel1A0tbdVs"><b data-page-node-id="T8QAYCGb4CztSeCSRRSB4s">📤 导出视频</b><button class="x" onclick="closeExport()" data-page-node-id="LOsnFVGMRcKQyOVQXXbUFl">✕</button></div>
+    <div class="modal-body" data-page-node-id="YMxymeq8IoAAu6Rvw3FalL">
+      <p class="sub" style="margin:0 0 12px" id="exportTitle" data-page-node-id="dnERoDREmMguQGd3M9vWDy">选择导出比例</p>
+      <div class="ratio-grid" id="ratioGrid" data-page-node-id="SGlh7fSbEZDxZyFOYeSPFZ"></div>
+      <div class="field-label" data-page-node-id="ABeMh0zqsbtMywOLd7lLiq">分辨率</div>
+      <select id="exportRes" style="width:100%" data-page-node-id="MjFNA9LZGqEXDSEiTM7h70">
+        <option data-page-node-id="GmcVCbHPtZ08FsiSOefnzg">1080p（推荐）</option><option data-page-node-id="86ohWA3Yc4zxI4f4gKf2WB">720p</option><option data-page-node-id="kpGSuYrZFJLPHIJ6IscmaB">4K（消耗更多算力）</option>
+      </select>
+      <div class="field-label" data-page-node-id="iGmRLQStwQjcSZuzXHmIbV">水印</div>
+      <label style="font-size:12px" data-page-node-id="S3jX0c65veBlsDg4k9ujzd"><input type="checkbox" id="exportWm" checked data-page-node-id="Oqg3ajayqnLGnvla1Zn5KP"> 添加「OpenMontage」水印（免费版）</label>
+    </div>
+    <div class="modal-foot" data-page-node-id="76G0t2AGR8lJ8OagrWMDGq">
+      <button class="btn btn-ghost btn-sm" onclick="closeExport()" data-page-node-id="8WdY2YcXwT2wUUTFAO8XWX">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="doExport()" data-page-node-id="IiKf2SU6oE9kQwvOCZcmb5">开始导出</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 作品产物 Modal ===== -->
+<!-- ===== 模板市场 · 立即生成 ===== -->
+<div class="modal-mask" id="tplUseMask" data-page-node-id="SCTTUUokQoXbCa98rQpUgq">
+  <div class="modal" data-page-node-id="MH0WsD0AObQyzt6R0OjdqM">
+    <div class="modal-head" data-page-node-id="mIxq8nUsraMa7vxgp6Mwwp"><b id="tplQuickName" data-page-node-id="qMEslXLUlfiFmyWnHBKOX9">🚀 立即生成</b><button class="x" onclick="closeTplQuick()" data-page-node-id="wCteLoa8hV6Jfo6XUvzGd9">✕</button></div>
+    <div class="modal-body" data-page-node-id="3HnI7G2Kz4HHLT5KQQDbgm">
+      <p class="sub" style="margin:0 0 10px" data-page-node-id="WaYy94zKuH53XhZqghk142">确认或修改内容后直接提交，AI 将按模板流水线自动完成脚本 → 分镜 → 素材 → 成片。</p>
+      <div id="tplQuickMeta" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" data-page-node-id="frSnvfv9tD4VGyqNrgybB6"></div>
+      <div class="field-label" data-page-node-id="FCNKzS8rFWCCYu0NrbdWW2">填入你的主题 / 脚本（可编辑示例）</div>
+      <textarea id="tplQuickInput" style="min-height:120px;width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;font-size:13.5px;outline:none;resize:vertical" placeholder="一句话描述你想做的视频…"></textarea>
+      <div class="cap-hint" style="margin-top:6px" data-page-node-id="n8u90hIgiiyeGPjNk2A8Ql">💡 也可以只给主题，AI 会自动扩写成完整脚本。</div>
+    </div>
+    <div class="modal-foot" data-page-node-id="XMwKI1MfXWBDklKQnPt30j">
+      <button class="btn btn-ghost btn-sm" onclick="closeTplQuick()" data-page-node-id="Aqg8caEqqQalECT1EFtAtw">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="runTplQuick()" data-page-node-id="9QnOmVgHhlKusL4M1rvjAn">🚀 开始生成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 作品产物 Modal ===== -->
+<div class="modal-mask" id="productMask" data-page-node-id="g9uw35sXjQRKqJsXG0bCkL">
+  <div class="modal" style="max-width:720px" data-page-node-id="CWuNIFoAol95eUyJDI0rTB">
+    <div class="modal-head" data-page-node-id="JGWZcHOjSAAZO3gHJYYtkT"><b data-page-node-id="4sVpTSAHJ46lHUvVmLu9Vl">🎬 作品产物</b><button class="x" onclick="closeProduct()" data-page-node-id="pc21eZ8nDQVdglOQInq8Oz">✕</button></div>
+    <div class="modal-body" id="productBody" data-page-node-id="mNyc0a6XtDoGxDnmoSObIn"></div>
+  </div>
+</div>
+
+<!-- ===== 新用户 API Key 引导 Modal ===== -->
+<div class="modal-mask" id="apizGuideMask" data-page-node-id="3ejIA3Z4rKgPna0UeeRg4x">
+  <div class="modal" data-page-node-id="90CmYwBds3QAbkH9HuiYyf">
+    <div class="modal-head" data-page-node-id="DQXVxeHB0slZ5Bsash7jdh"><b data-page-node-id="b6J7ShmMGvCBRm7F3lw1sx">🔑 获取你的 API Key</b><button class="x" onclick="closeApizGuide()" data-page-node-id="M5kWQ6VQeEq6KTd0SBQNf7">✕</button></div>
+    <div class="modal-body" data-page-node-id="gK7GSqANOZ4O8NpU36FZwo">
+      <p style="margin:0 0 10px" data-page-node-id="n06EyZf1Qd70CbrZe0yHLo">欢迎使用 OpenMontage！开始创作前，先获取主视频源的 API Key：</p>
+      <div style="background:#f4f7fb;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0" data-page-node-id="7cdzc9rHy6fe6LR6BM7VVQ">
+        <b style="color:#159957" data-page-node-id="dhmVC0mHPoroMNQtshP2Et">🎥 APIZ（MiniMax 视频）</b>
+        <p class="sub" style="margin:6px 0 10px" data-page-node-id="CK00n5IhO53KfZqQFGLHSQ">主视频源，注册即送额度。推荐码已内置，点击一键直达：</p>
+        <a href="https://apiz.ai/#/?ref=8WEB6F03" target="_blank" rel="noopener" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;justify-content:center" data-page-node-id="QwaBmJDOqzDesBalOSrAq7">
+          ➜ 去 apiz.ai 获取 API Key
+        </a>
+      </div>
+      <p class="sub" style="margin:8px 0 0" data-page-node-id="0orrxANIaB9LghzpUCQBtn">拿到 Key 后：<b data-page-node-id="8nEYTcrCAAiLTIWWhpkdCW">设置 → 我的账户 Key → 填入 APIZ_API_KEY → 保存</b>，即可开始完整出片。</p>
+    </div>
+    <div class="modal-foot" data-page-node-id="Gy4gAyOgArkbWM2pqCxYcd">
+      <button class="btn btn-ghost btn-sm" onclick="closeApizGuide()" data-page-node-id="wjGTD6fOzQxvVXVWAieNVt">稍后再说</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 公共广场播放 Modal ===== -->
+<div class="modal-mask" id="playMask" data-page-node-id="CLcowozgLokFak6Dy7GJcI">
+  <div class="modal" style="max-width:720px" data-page-node-id="VaDeK3Xr64ddDyW3otimk5">
+    <div class="modal-head" data-page-node-id="Xlnlzc3dTLTTu4emE9kPxk"><b id="playTitle" data-page-node-id="DRXLill7HH0NXqlFaxGzZO">▶ 视频播放</b><button class="x" onclick="closePlay()" data-page-node-id="48u241QJWjtHwsRWN9oeRG">✕</button></div>
+    <div class="modal-body" id="playBody" data-page-node-id="UHPOJpWCq6RW0PlizqpqBX"></div>
+  </div>
+</div>
+
+<!-- ===== AI 标题/封面 Modal ===== -->
+<div class="modal-mask" id="aiMask" data-page-node-id="FG13P9ehFiJg4CxbXTwBSJ">
+  <div class="modal" data-page-node-id="6FbFBt8fpdhxTaOAdDHjIo">
+    <div class="modal-head" data-page-node-id="SRK6RrIOdPB2bBtA41rGAM"><b data-page-node-id="GRYLvD6wCzVTjfpFofuAFH">✨ 发布助手 · AI 标题/封面/标签</b><button class="x" onclick="closeAi()" data-page-node-id="6FyxnoFw0p9POTPnqURLEa">✕</button></div>
+    <div class="modal-body" data-page-node-id="dpJrBlmoXBISrjyt4ccVe8">
+      <p class="sub" style="margin:0 0 12px" data-page-node-id="q8A9GYvm41840vuln8GRUN">AI 已分析你的视频内容，生成发布优化方案。</p>
+      <div class="field-label" data-page-node-id="UXBRFVL49wrZyjsBLU3Wep">标题候选（点击选择）</div>
+      <div id="aiTitles" data-page-node-id="3HNrbfQ7Les3ebEgxupoLl"></div>
+      <div class="field-label" data-page-node-id="HX2WWDbgAzmFq7v9saTqDO">封面候选（点击选择）</div>
+      <div class="cover-row" id="aiCovers" data-page-node-id="LHAHWHD1diAISLW7SYcZ88"></div>
+      <div class="field-label" data-page-node-id="kj2UxFfdy1vByqMp5sA8Ws">话题标签（点击多选）</div>
+      <div class="tag-row" id="aiTags" data-page-node-id="HNrnVsRBXjQU2Twpfb9pP5"></div>
+      <div class="field-label" data-page-node-id="wzGB5AhBmrux0Y54TlEuD4">发布到</div>
+      <div class="ratio-grid" id="aiPlatforms" style="grid-template-columns:repeat(4,1fr)" data-page-node-id="gVeqNfKB1U8FGHlzqdfyA4">
+        <div class="ratio-opt sel" data-p="gallery" onclick="pickPlatform(this)" data-page-node-id="LH9ZYlVR6kAZSNGW7jiBSj"><div class="rn" data-page-node-id="DAekQmNPVkj6KF2lOdTFr3">🎪 公共广场</div></div>
+        <div class="ratio-opt" data-p="douyin" onclick="pickPlatform(this)" data-page-node-id="R2qs3UtB7S9HONjqSCwaBe"><div class="rn" data-page-node-id="zolOj5XqBTbCQS8GbNmovs">📱 抖音</div></div>
+        <div class="ratio-opt" data-p="bili" onclick="pickPlatform(this)" data-page-node-id="t0a0EIFbDiUCDGE0rwVj0h"><div class="rn" data-page-node-id="Oxl6VaRBD3DOCkMNakiRTd">📺 B站</div></div>
+        <div class="ratio-opt" data-p="yt" onclick="pickPlatform(this)" data-page-node-id="M0nZa6sCVII6zHE5UqLoOm"><div class="rn" data-page-node-id="YOXG3Jvsgi6MjVCBFjEk7L">▶️ YouTube</div></div>
+      </div>
+    </div>
+    <div class="modal-foot" data-page-node-id="3HvMo8SCqsmkTotjwv746O">
+      <button class="btn btn-ghost btn-sm" onclick="closeAi()" data-page-node-id="40v5Py7mWFIDEBep243MzD">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="applyAi()" data-page-node-id="0WG3Sne21boBFmqSY3SPW8">应用并发布</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 二次创作 · 长→短切片 Modal ===== -->
+<div class="modal-mask" id="clipMask" data-page-node-id="oUzwDcNiB4477eFrknz7so">
+  <div class="modal" data-page-node-id="WqDFP7eAkVR65KDH2qAwdQ">
+    <div class="modal-head" data-page-node-id="nnKMicNBMFbvX2Ct54aetr"><b data-page-node-id="LC8piyGK27d6rt8f3ggktC">✂️ 二次创作 · 长视频切片</b><button class="x" onclick="closeClip()" data-page-node-id="942FQQTd1c9wdp2JBR8XOF">✕</button></div>
+    <div class="modal-body" data-page-node-id="JyJX97lvcWUGV2JseNtE2O">
+      <p class="sub" style="margin:0 0 12px" data-page-node-id="9GqHCNeGzgkvgfXP1eU3ri">AI 从你的长视频中找出高能片段，切成竖屏爆款短视频。</p>
+      <div class="field-label" data-page-node-id="uF7qjPBLTtOwYFKXDAOFwa">切片数量</div>
+      <div class="ratio-grid" id="clipCount" style="grid-template-columns:repeat(3,1fr)" data-page-node-id="6w1m7JdxXxVjyXknL18RqX">
+        <div class="ratio-opt sel" onclick="pickClipCount(this,3)" data-page-node-id="7LM8myxJib8HMbM8YH1IgV"><div class="rn" data-page-node-id="0oiAtg69qEO5zNfiCiS96U">3 条</div><div class="rd" data-page-node-id="rUrX5YV1pR6RDCjgxGkbdZ">最精华</div></div>
+        <div class="ratio-opt" onclick="pickClipCount(this,5)" data-page-node-id="ivXUmv5RQ4RREHsQ8IBH1u"><div class="rn" data-page-node-id="T1WfRk7ZZ2nOOWaER5uWzY">5 条</div><div class="rd" data-page-node-id="eqfqnCGtGdCdScS498s3eZ">推荐</div></div>
+        <div class="ratio-opt" onclick="pickClipCount(this,8)" data-page-node-id="yO4YHkVLhnOxFDE6Oz4wJC"><div class="rn" data-page-node-id="thX8iVDNQAlv6nZspXUkgI">8 条</div><div class="rd" data-page-node-id="TCfqy3uKWriZDFKdn4fqft">最大化</div></div>
+      </div>
+      <div class="field-label" data-page-node-id="rGS1eAAfUFI39clrxfFUw6">每条时长</div>
+      <div class="ratio-grid" id="clipDur" style="grid-template-columns:repeat(3,1fr)" data-page-node-id="VUClZoEshZf3XsKZCpg8rz">
+        <div class="ratio-opt sel" onclick="pickClipDur(this,'15s')" data-page-node-id="U2KgteDz7cOE8TGIX714sU"><div class="rn" data-page-node-id="pbDwIeikU13z75t6UxLokb">15s</div><div class="rd" data-page-node-id="QBEL93sS8SDhAfySBsZmRz">快节奏</div></div>
+        <div class="ratio-opt" onclick="pickClipDur(this,'30s')" data-page-node-id="vs6jG2bQ4Yu6DiTCkacwKF"><div class="rn" data-page-node-id="ZRuPPugJ6uHw0Ci7Cf4GMX">30s</div><div class="rd" data-page-node-id="fsJwOY4g0SDbU9pLTSAhYJ">标准</div></div>
+        <div class="ratio-opt" onclick="pickClipDur(this,'60s')" data-page-node-id="qANzesFJ9rZ23DQLaYVR0x"><div class="rn" data-page-node-id="Gfei7OTgIWq79dRX78Bbf4">60s</div><div class="rd" data-page-node-id="WdmaSu8Hqry3fC94z8FMfO">完整讲述</div></div>
+      </div>
+      <div class="field-label" data-page-node-id="v7GvhpgPcfCH9oLvJb3X9B">爆款片段预览（AI 评分）</div>
+      <div id="clipPreview" data-page-node-id="kcTJhec54B04DorAOWS74j"></div>
+    </div>
+    <div class="modal-foot" data-page-node-id="gRW9Zb3o4bFmph1oyPAqoP">
+      <button class="btn btn-ghost btn-sm" onclick="closeClip()" data-page-node-id="VH8qEKhKlEoIrBjjlRErBY">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="doClip()" data-page-node-id="9411Pl1wLfU2d7SU2s3yEq">生成切片</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 数据（原型模拟） ================= */
+const STAGES = [
+  {key:'research',   name:'市场调研',   desc:'搜索主题资料与受众', artifact:'research_brief.json'},
+  {key:'proposal',   name:'概念提案',   desc:'3 个方案 + 成本预估', artifact:'proposal_packet.json'},
+  {key:'script',     name:'脚本写作',   desc:'旁白文案与节奏',     artifact:'script.json'},
+  {key:'scene_plan', name:'分镜规划',   desc:'每场景画面与镜头',   artifact:'scene_plan.json'},
+  {key:'assets',     name:'素材生成',   desc:'视频/配音/图像/音乐', artifact:'asset_manifest.json'},
+  {key:'compose',    name:'剪辑合成',   desc:'渲染成片 + 字幕',    artifact:'render_report.json'},
+  {key:'publish',    name:'发布',       desc:'产物就绪，可预览',   artifact:'publish_log.json'},
+];
+const AI_REPLIES = {
+  start: '收到！🎬 我理解你想做一个「{topic}」的视频。已创建任务 <b>job_cf3d31f81b7b</b>，开始按 <b>animated-explainer</b> 流水线制作，请关注右侧进度面板 👉',
+};
+
+/* ================= API 数据层（真后端 ↔ mock 回退） ================= */
+/* 检测 /api/health 可用则用真 API（FastAPI + SQLite），否则回退内存 mock。
+   API 模式：登录/作品/广场全部持久化到后端；mock 模式：保留演示数据。 */
+const API = {
+  base: '',
+  token: localStorage.getItem('om_token') || null,
+  user: null,
+  online: false,
+  async init(){
+    try{
+      const r = await fetch(this.base + '/api/health', {method:'GET'});
+      this.online = r.ok;
+    }catch(e){ this.online = false; }
+    if(this.online && this.token){
+      try{
+        const r = await fetch(this.base + '/api/me', {headers:{Authorization:'Bearer '+this.token}});
+        if(r.ok) this.user = await r.json();
+        else { this.token = null; localStorage.removeItem('om_token'); }
+      }catch(e){}
+    }
+    this.refreshStatusBadge();
+  },
+  refreshStatusBadge(){
+    const b = document.getElementById('apiBadge');
+    if(!b) return;
+    b.textContent = this.online ? '🔗 已连接后端' : '🧪 演示模式（无后端）';
+    b.className = 'badge ' + (this.online ? 'ok' : 'warn');
+  },
+  async _req(method, path, body){
+    const opt = {method, headers:{}};
+    if(body !== undefined){ opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+    if(this.token) opt.headers['Authorization'] = 'Bearer ' + this.token;
+    const r = await fetch(this.base + path, opt);
+    if(!r.ok){
+      let detail = r.status + ' ' + r.statusText;
+      try{ const d = await r.json(); detail = d.detail || detail; }catch(e){}
+      throw new Error(detail);
+    }
+    if(r.status === 204) return null;
+    return r.json();
+  },
+  async login(email, password){
+    const d = await this._req('POST', '/api/auth/login', {email, password});
+    this.token = d.token; this.user = d.user;
+    localStorage.setItem('om_token', this.token);
+    return d.user;
+  },
+  async register(username, email, password, plan){
+    const d = await this._req('POST', '/api/auth/register', {username, email, password, plan});
+    this.token = d.token; this.user = d.user;
+    localStorage.setItem('om_token', this.token);
+    return d.user;
+  },
+  async logout(){
+    try{ await this._req('POST', '/api/auth/logout'); }catch(e){}
+    this.token = null; this.user = null;
+    localStorage.removeItem('om_token');
+  },
+  async getWorks(){ const d = await this._req('GET', '/api/me/works'); return d.works; },
+  async createWork(w){ return this._req('POST', '/api/me/works', w); },
+  async patchWork(id, patch){ return this._req('PATCH', '/api/me/works/' + id, patch); },
+  async deleteWork(id){ return this._req('DELETE', '/api/me/works/' + id); },
+  async getGallery(){ const d = await this._req('GET', '/api/gallery'); return d.works; },
+};
+
+/* mock 回退：每个用户一份完整隔离档案 */
+let currentUser = '纲哥';
+const USER_PROFILES = {
+  '纲哥': {
+    plan: '专业版', balance: '¥12.40',
+    works: [
+      {id:'w1', title:'HTTP 与 HTTPS 的区别（60s 动画）', dur:'60s', date:'08-18', status:'done', emoji:'🔐', likes:32, published:true},
+      {id:'w2', title:'海南清补凉为什么火（90s 科普）',   dur:'90s', date:'08-19', status:'done', emoji:'🥥', likes:18, published:false},
+      {id:'w3', title:'新式茶饮开业广告（30s）',          dur:'30s', date:'08-19', status:'running', emoji:'🧋', likes:0, published:false},
+    ],
+    keys: [
+      {group:'🧠 创意 LLM', desc:'写脚本、分镜、调研用的模型', rows:[
+        {name:'OpenAI', desc:'gpt-4o-mini · 已配置', on:true,  val:'sk-proj-••••••••••••4f2a'},
+        {name:'Anthropic Claude', desc:'可选 · 备选模型', on:false, val:''},
+      ]},
+      {group:'🎥 视频生成', desc:'生成动态画面 / 视频片段', rows:[
+        {name:'APIZ（MiniMax）', desc:'已验证 · 主用视频源', on:true, val:'sk-8294••••••••••••••e390'},
+        {name:'FAL（可灵/Seedance）', desc:'可选 · 高质量备选', on:false, val:''},
+        {name:'Pexels 素材库', desc:'免费 · 无需付费', on:true, val:'已配置'},
+      ]},
+      {group:'🗣️ 语音合成（TTS）', desc:'旁白配音', rows:[
+        {name:'百炼 DashScope', desc:'qwen3-tts · 已配置', on:true, val:'sk-••••••••a6b2'},
+      ]},
+      {group:'🎨 图像生成', desc:'静态画面 / 插画', rows:[
+        {name:'百炼 DashScope', desc:'通义万相 · 已配置', on:true, val:'sk-••••••••a6b2'},
+      ]},
+      {group:'🎵 音乐', desc:'背景音乐 / 音效', rows:[
+        {name:'Pixabay 音乐库', desc:'免费 · 无需付费', on:true, val:'已配置'},
+      ]},
+    ],
+    billing: {
+      fee:'¥12.40', left:'¥87.60', tasks:14, render:'2.1h',
+      keyCosts:[['OpenAI（创意）','¥3.42'],['APIZ（视频）','¥8.60'],['DashScope（TTS/图）','¥1.15'],['素材库（免费）','¥0']],
+    },
+  },
+  '阿玲': {
+    plan: '免费版', balance: '¥0.00',
+    works: [
+      {id:'w4', title:'Python 入门 60 秒速览', dur:'60s', date:'08-17', status:'done', emoji:'🐍', likes:45, published:true},
+      {id:'w5', title:'我的旅行 Vlog 混剪',     dur:'120s',date:'08-16', status:'done', emoji:'✈️', likes:22, published:false},
+    ],
+    keys: [
+      {group:'🧠 创意 LLM', desc:'写脚本、分镜、调研用的模型', rows:[
+        {name:'OpenAI', desc:'gpt-4o-mini · 已配置', on:true, val:'sk-proj-••••••••••••9f71'},
+      ]},
+      {group:'🎥 视频生成', desc:'生成动态画面 / 视频片段', rows:[
+        {name:'APIZ（MiniMax）', desc:'未配置 · 免费版需自带', on:false, val:''},
+        {name:'Pexels 素材库', desc:'免费 · 无需付费', on:true, val:'已配置'},
+      ]},
+      {group:'🗣️ 语音合成（TTS）', desc:'旁白配音', rows:[
+        {name:'百炼 DashScope', desc:'未配置 · 免费版仅 Google TTS', on:false, val:''},
+      ]},
+      {group:'🎨 图像生成', desc:'静态画面 / 插画', rows:[
+        {name:'百炼 DashScope', desc:'未配置 · 用 Pexels 素材替代', on:false, val:''},
+      ]},
+      {group:'🎵 音乐', desc:'背景音乐 / 音效', rows:[
+        {name:'Pixabay 音乐库', desc:'免费 · 无需付费', on:true, val:'已配置'},
+      ]},
+    ],
+    billing: {
+      fee:'¥0.00', left:'—', tasks:6, render:'0.9h',
+      keyCosts:[['OpenAI（创意）','¥1.08'],['Pexels/Pixabay（素材）','¥0'],['素材库（免费）','¥0']],
+    },
+  },
+  '老王': {
+    plan: '专业版', balance: '¥48.20',
+    works: [
+      {id:'w6', title:'公司宣传片（英文版）', dur:'90s', date:'08-15', status:'done', emoji:'🏢', likes:9, published:true},
+    ],
+    keys: [
+      {group:'🧠 创意 LLM', desc:'写脚本、分镜、调研用的模型', rows:[
+        {name:'OpenAI', desc:'gpt-4o-mini · 已配置', on:true, val:'sk-proj-••••••••••••c803'},
+        {name:'Anthropic Claude', desc:'claude-sonnet · 已配置', on:true, val:'sk-ant-••••••••••••5d1e'},
+      ]},
+      {group:'🎥 视频生成', desc:'生成动态画面 / 视频片段', rows:[
+        {name:'APIZ（MiniMax）', desc:'已验证 · 主用视频源', on:true, val:'sk-8294••••••••••••77aa'},
+        {name:'FAL（可灵/Seedance）', desc:'已验证 · 高质量备选', on:true, val:'fal-••••••••3c8b'},
+        {name:'Pexels 素材库', desc:'免费 · 无需付费', on:true, val:'已配置'},
+      ]},
+      {group:'🗣️ 语音合成（TTS）', desc:'旁白配音', rows:[
+        {name:'百炼 DashScope', desc:'qwen3-tts · 已配置', on:true, val:'sk-••••••••b1f4'},
+        {name:'ElevenLabs', desc:'高质量英文配音 · 已配置', on:true, val:'sk-••••••••9a02'},
+      ]},
+      {group:'🎨 图像生成', desc:'静态画面 / 插画', rows:[
+        {name:'百炼 DashScope', desc:'通义万相 · 已配置', on:true, val:'sk-••••••••b1f4'},
+      ]},
+      {group:'🎵 音乐', desc:'背景音乐 / 音效', rows:[
+        {name:'Pixabay 音乐库', desc:'免费 · 无需付费', on:true, val:'已配置'},
+        {name:'Suno', desc:'AI 生成原创音乐 · 已配置', on:true, val:'suno-••••••••2f7e'},
+      ]},
+    ],
+    billing: {
+      fee:'¥48.20', left:'¥51.80', tasks:23, render:'3.7h',
+      keyCosts:[['OpenAI（创意）','¥6.15'],['APIZ（视频）','¥18.40'],['FAL（视频）','¥12.30'],['DashScope（TTS/图）','¥4.70'],['Suno（音乐）','¥2.10']],
+    },
+  },
+};
+const gallerySeed = [
+  {title:'3 分钟看懂大语言模型', emoji:'🤖', author:'阿玲', likes:127, views:'3.2k', tag:'科普'},
+  {title:'乡村音乐 MV 风格短片', emoji:'🎸', author:'老王', likes:89, views:'1.8k', tag:'动画'},
+  {title:'电商产品 360° 展示',   emoji:'📦', author:'小鹿', likes:64, views:'1.1k', tag:'商业'},
+  {title:'数学之美 · 分形动画',  emoji:'🌀', author:'阿玲', likes:152, views:'4.1k', tag:'动画'},
+];
+const grads = ['linear-gradient(140deg,#dbe6fd,#e9f0fe)','linear-gradient(140deg,#fde9d9,#fdf3e4)','linear-gradient(140deg,#e2f4e7,#eefaf1)','linear-gradient(140deg,#f2e5fb,#f9effd)','linear-gradient(140deg,#fde3e7,#fef0f2)'];
+
+/* 模板市场：对应 pipeline_defs/ 里的真实流水线（与创作台流水线下拉共用本数组） */
+const TPL_GRAD = {'📚 科普讲解':'linear-gradient(140deg,#3a7afe,#6ba1ff)','🎨 动画创作':'linear-gradient(140deg,#8b5cf6,#b78bff)','💻 屏幕演示':'linear-gradient(140deg,#0891b2,#22b8cf)','✂️ 二次创作':'linear-gradient(140deg,#e8851e,#ff9f43)','🌍 本地化':'linear-gradient(140deg,#0e9f6e,#34d399)'};
+const TEMPLATES = [
+  {pipeline:'animated-explainer',  cat:'📚 科普讲解', emoji:'🧠', name:'动画科普解说', desc:'适合知识类/科普/教学视频：AI 调研 → 脚本 → 动画分镜 → 配音成片，一条龙讲清一个知识点。', meta:['60-120s','自动字幕'], need:['🎨 AI 画面','🗣 AI 配音','✂️ 字幕'], est:'约 5-8 分钟', hot:true, prompt:'做一个 60 秒动画科普视频，主题是：',
+   ex:'做一个 60 秒动画科普视频，主题是：为什么海南清补凉这么火？从椰子到椰奶的消暑密码'},
+  {pipeline:'documentary-montage', cat:'📚 科普讲解', emoji:'🌍', name:'纪实混剪', desc:'新闻/纪录片风格：真实素材混剪 + 旁白 + 背景音乐，适合行业观察、城市人文类选题。', meta:['90-180s','纪实感'], need:['📹 素材混剪','🗣 AI 旁白','🎵 配乐'], est:'约 10-15 分钟', hot:false, prompt:'做一条 90 秒纪实风格短片，主题是：',
+   ex:'做一条 90 秒纪实风格短片，主题是：海南自贸港封关后，年轻人的机会在哪里'},
+  {pipeline:'animation',           cat:'🎨 动画创作', emoji:'🎨', name:'自由动画', desc:'任意风格的动画短片：角色、场景、运镜全 AI 生成，表现力强，适合创意向内容。', meta:['30-90s','自由风格'], need:['🎨 AI 画面','🗣 AI 配音'], est:'约 6-10 分钟', hot:false, prompt:'做一个 60 秒动画短片，主题是：',
+   ex:'做一个 60 秒动画短片，主题是：一个 AI 助手的诞生，从代码到成片的一天'},
+  {pipeline:'character-animation', cat:'🎨 动画创作', emoji:'🧚', name:'角色动画', desc:'角色一致性动画：固定主角形象的连续故事，适合 IP 连载、品牌吉祥物内容。', meta:['30-120s','角色一致'], need:['🎨 AI 画面','🧍 形象一致','🗣 AI 配音'], est:'约 8-12 分钟', hot:false, prompt:'做一个角色动画短片，主角是，主题是：',
+   ex:'做一个角色动画短片，主角是一只海南坡鹿，主题是：坡鹿带你逛海口骑楼老街'},
+  {pipeline:'cinematic',           cat:'🎨 动画创作', emoji:'🎬', name:'电影感短片', desc:'电影级运镜与氛围：适合品牌片、概念片、城市形象片等高品质表达。', meta:['60-180s','电影感'], need:['🎨 AI 画面','🎵 配乐'], est:'约 10-15 分钟', hot:true, prompt:'做一条 90 秒电影感短片，主题是：',
+   ex:'做一条 90 秒电影感短片，主题是：海口晚霞里的城市脉动'},
+  {pipeline:'screen-demo',         cat:'💻 屏幕演示', emoji:'🖥️', name:'录屏讲解', desc:'软件/网页操作演示：录屏 + 配音 + 标注，适合教程、功能教学类视频。', meta:['60-300s','操作标注'], need:['🖥️ 录屏素材','🗣 AI 配音'], est:'约 8-12 分钟', hot:false, prompt:'做一个 2 分钟的软件操作讲解视频，内容是：',
+   ex:'做一个 2 分钟的软件操作讲解视频，内容是：用 Excel 做学生成绩统计与可视化'},
+  {pipeline:'hybrid',              cat:'💻 屏幕演示', emoji:'🔀', name:'混合型视频', desc:'真实素材 + AI 画面混排：适合教程、评测、Vlog、直播切片等需要画面+讲解的场景。', meta:['60-300s','画面+讲解'], need:['📹 素材','🎨 AI 补充'], est:'约 6-10 分钟', hot:true, prompt:'做一个混合素材视频，主题是：',
+   ex:'做一个混合素材视频，主题是：智能进销存系统功能评测'},
+  {pipeline:'clip-factory',        cat:'✂️ 二次创作', emoji:'✂️', name:'长视频切片', desc:'把长视频切成爆款短视频：AI 找高能片段 + 竖屏重构 + 字幕，一稿多发。', meta:['15-60s/条','自动切片'], need:['📼 上传长视频','✂️ AI 切片'], est:'约 3-6 分钟', hot:true, prompt:'把这段长视频切成 3 条爆款短视频：',
+   ex:'把这段长视频切成 3 条爆款短视频：素材是 10 分钟的教学录像，重点保留操作演示片段'},
+  {pipeline:'podcast-repurpose',   cat:'✂️ 二次创作', emoji:'🎧', name:'播客转视频', desc:'播客/访谈音频转短视频：关键片段 + 波形/字幕动画，让音频内容可视化。', meta:['15-60s/条','音频转视频'], need:['🎙️ 音频素材','✂️ 金句提取'], est:'约 3-6 分钟', hot:false, prompt:'把这段播客做成 3 条短视频：',
+   ex:'把这段播客做成 3 条短视频：内容是 30 分钟的技术访谈，挑 3 个金句片段'},
+  {pipeline:'localization-dub',    cat:'🌍 本地化', emoji:'🌐', name:'多语言配音', desc:'视频翻译配音：保留原声情绪，生成多语言字幕与配音，出海内容必备。', meta:['多语言','配音+字幕'], need:['🎬 源视频','🗣 多语言 TTS'], est:'约 5-10 分钟', hot:false, prompt:'把这个视频翻译配音成英文：',
+   ex:'把这个视频翻译配音成英文：内容是我的产品介绍视频'},
+];
+
+/* ================= 页面切换 ================= */
+const PAGES = ['create','templates','works','gallery','board','tools','account','settings'];
+const CRUMBS = {create:'创作台', templates:'模板市场', works:'我的作品', gallery:'公共广场', board:'任务看板', tools:'服务器工具状态', account:'账户中心', settings:'API Keys 配置'};
+function goto(page){
+  localStorage.setItem('om_page', page);   // 记住当前页，刷新后恢复
+  PAGES.forEach(p => document.getElementById('page-'+p).classList.toggle('hidden', p!==page));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page===page));
+  document.getElementById('crumb').textContent = CRUMBS[page];
+  if(page==='works') renderWorks();
+  if(page==='gallery') renderGallery();
+  if(page==='templates') renderTemplates();
+  if(page==='board') renderBoard();
+  if(page==='tools') renderToolsPage();
+  if(page==='account') renderAccount();
+  if(page==='settings') renderKeys();
+}
+document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => goto(n.dataset.page)));
+
+/* 创作台流水线下拉：与模板市场共用 TEMPLATES（13 条），保证数量一致 */
+function syncPipelineSel(){
+  const sel = document.getElementById('pipelineSel');
+  if(!sel) return;
+  sel.innerHTML = TEMPLATES.map(t =>
+    `<option value="${t.pipeline}">${t.pipeline} · ${t.name}</option>`).join('');
+}
+syncPipelineSel();
+
+/* ---- 素材视频上传（clip-factory 等素材输入类流水线）---- */
+document.getElementById('srcVideoInput').addEventListener('change', async (ev) => {
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  const st = document.getElementById('srcVideoState');
+  st.textContent = '上传中: ' + file.name + '…';
+  try{
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch('/api/uploads/video', {method:'POST', body: fd});
+    const d = await r.json();
+    window._sourceVideo = d.video_id;
+    st.textContent = `✓ 已上传 ${file.name}（${Math.round(d.size_bytes/1048576)}MB，${d.duration_seconds}s，${d.width}x${d.height}）— 提交任务时自动附带`;
+    st.style.color = 'var(--ok)';
+    toast('素材视频上传成功，提交任务时会自动分析并切片 🎬');
+  }catch(e){
+    st.textContent = '✗ 上传失败: ' + e.message;
+    st.style.color = 'var(--bad)';
+  }
+});
+
+/* ================= 登录 ================= */
+let authMode = 'login';
+function toggleAuth(e){
+  e.preventDefault();
+  authMode = authMode==='login' ? 'register' : 'login';
+  document.getElementById('loginTitle').textContent = authMode==='login' ? '欢迎回来' : '创建账户';
+  document.getElementById('loginSub').textContent = authMode==='login' ? '登录你的 OpenMontage 账户' : '注册后立即开始创作';
+  document.getElementById('nameField').style.display = authMode==='login' ? 'none' : 'block';
+  document.getElementById('switchText').textContent = authMode==='login' ? '还没有账户？' : '已有账户？';
+  document.getElementById('switchLink').textContent = authMode==='login' ? '立即注册' : '去登录';
+  document.getElementById('loginBtn').textContent = authMode==='login' ? '登 录' : '注册并登录';
+}
+async function doLogin(e){
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPwd').value;
+  const name = document.getElementById('regName').value.trim();
+  const btn = document.getElementById('loginBtn');
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = authMode==='login' ? '登录中…' : '注册中…';
+  try{
+    if(API.online){
+      if(authMode==='login'){
+        await API.login(email, password);
+      } else {
+        await API.register(name || email.split('@')[0], email, password);
+      }
+      currentUser = API.user.username;
+    } else {
+      // mock 模式：直接用表单
+      if(authMode==='register' && name) currentUser = name;
+      localStorage.setItem('om_mock_user', currentUser);   // mock 登录也记住，刷新不丢
+    }
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    applyUserIdentity();
+    toast('欢迎回来，' + currentUser + '！');
+    goto('create');
+    if(authMode==='register'){ authMode='login'; showApizGuide(); }  // 新用户：引导获取 API Key
+  }catch(err){
+    toast('登录失败: ' + err.message);
+  }finally{
+    btn.disabled = false; btn.textContent = orig;
+  }
+}
+/* ---- 新用户 API Key 引导（apiz.ai 获取） ---- */
+function showApizGuide(){
+  const m = document.getElementById('apizGuideMask');
+  if(m) m.classList.add('show');
+}
+function closeApizGuide(){
+  const m = document.getElementById('apizGuideMask');
+  if(m) m.classList.remove('show');
+}
+async function logout(){
+  if(API.online) await API.logout();
+  localStorage.removeItem('om_page');
+  localStorage.removeItem('om_mock_user');
+  document.getElementById('appView').classList.add('hidden');
+  document.getElementById('loginView').classList.remove('hidden');
+  toast('已退出登录');
+}
+function applyUserIdentity(){
+  if(API.online && API.user){
+    const u = API.user;
+    document.getElementById('sideName').textContent = u.username;
+    document.getElementById('sideAvatar').textContent = u.username[0] || 'U';
+    refreshSideBalance();
+  }
+}
+
+/* ================= 对话 + 进度模拟 ================= */
+let running = false;
+function sendSugg(el){ document.getElementById('chatInput').value = el.textContent.replace(/^\d+秒[^：]*：/,''); sendMsg(); }
+function appendMsg(role, html){
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `<div class="mini-avatar">${role==='ai'?'OM':'纲'}</div><div class="bubble">${html}</div>`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function sendMsg(){
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if(!text || running) return;
+  appendMsg('user', text);
+  inp.value = '';
+  running = true;
+  document.getElementById('sendBtn').disabled = true;
+  const topic = text.length > 18 ? text.slice(0,18)+'…' : text;
+  const pl = document.getElementById('pipelineSel') ? document.getElementById('pipelineSel').value : 'animated-explainer';
+  document.querySelector('.prog-head .meta span b').textContent = pl;
+  appendMsg('ai', AI_REPLIES.start.replace('{topic}', topic).replace('animated-explainer', pl));
+  if(API.online){
+    submitRealJob(text, pl);
+  } else {
+    startProgress(text);
+  }
+}
+
+/* ---- 真任务：POST /api/jobs → 轮询真实阶段 ---- */
+let pollTimer = null;
+async function submitRealJob(prompt, pipeline){
+  initStagePanel();
+  appendStageMsg('创建任务', '正在提交到后端…', 'running');
+  try{
+    // 用户可勾选"完整出片"（默认创意阶段快速验证）
+    const creative = document.getElementById('creativeOnly') ? document.getElementById('creativeOnly').checked : true;
+    const body = {prompt, pipeline_type: pipeline, creative_only: creative, auto_approve: true};
+    if(window._sourceVideo){ body.source_video = window._sourceVideo; }
+    const j = await API._req('POST', '/api/jobs', body);
+    const jobId = j.id;
+    document.querySelector('.prog-head .jobid').textContent = jobId;
+    pollJob(jobId, prompt);
+  }catch(e){
+    failRun('提交任务失败: ' + e.message);
+  }
+}
+async function pollJob(jobId, prompt){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    try{
+      const j = await API._req('GET', '/api/jobs/' + jobId);
+      renderRealStages(j);
+      if(['completed','blocked','failed'].includes(j.status)){
+        clearInterval(pollTimer); pollTimer = null;
+        finishRealJob(j, prompt);
+      }
+    }catch(e){
+      clearInterval(pollTimer); pollTimer = null;
+      failRun('查询任务失败: ' + e.message);
+    }
+  }, 2000);
+  // 立即查一次
+  try{
+    const j = await API._req('GET', '/api/jobs/' + jobId);
+    renderRealStages(j);
+  }catch(e){}
+}
+function initStagePanel(){
+  document.getElementById('progEmpty').style.display = 'none';
+  const list = document.getElementById('stageList');
+  list.style.display = 'block';
+  list.innerHTML = STAGES.map(s => `
+    <div class="stage-row wait" id="sr-${s.key}">
+      <span class="sdot">${STAGES.indexOf(s)+1}</span>
+      <div class="sinfo"><div class="t">${s.name}</div><div class="d">${s.desc}</div></div>
+      <span class="st"><span class="pill wait" id="sp-${s.key}">等待中</span></span>
+    </div>`).join('');
+  document.getElementById('meterFill').style.width = '0%';
+  document.getElementById('meterPct').textContent = '0%';
+}
+function renderRealStages(job){
+  const stages = job.stages || [];
+  const order = ['research','proposal','idea','script','scene_plan','assets','edit','compose','publish'];
+  let done = 0;
+  stages.forEach(s => {
+    const key = s.stage;
+    const row = document.getElementById('sr-' + key);
+    const pill = document.getElementById('sp-' + key);
+    if(!row || !pill) return;
+    if(s.status === 'completed'){
+      row.className = 'stage-row done'; pill.className = 'pill done'; pill.textContent = '已完成 ✓'; done++;
+    } else if(s.status === 'running' || s.status === 'in_progress'){
+      row.className = 'stage-row running'; pill.className = 'pill running'; pill.textContent = '进行中';
+    } else if(s.status === 'blocked' || s.status === 'failed'){
+      row.className = 'stage-row'; pill.className = 'pill failed'; pill.textContent = '失败';
+    }
+  });
+  // 若有 blocker，在最顶部显示
+  const blockerEl = document.getElementById('runBlocker');
+  if(blockerEl){
+    blockerEl.textContent = job.blocker ? '⚠️ ' + job.blocker : '';
+    blockerEl.className = job.blocker ? 'err' : 'hidden';
+  }
+  const pct = stages.length ? Math.round((done/stages.length)*100) : 0;
+  document.getElementById('meterFill').style.width = pct+'%';
+  document.getElementById('meterPct').textContent = pct+'%';
+}
+function appendStageMsg(name, desc, status){
+  appendMsg('ai', `📌 <b>${name}</b>：${desc}`);
+}
+function finishRealJob(job, prompt){
+  running = false;
+  document.getElementById('sendBtn').disabled = false;
+  if(job.status === 'completed'){
+    appendMsg('ai', '🎉 任务完成！成片已保存到 <b>我的作品</b>。');
+    API.createWork({title: prompt.length>30 ? prompt.slice(0,30)+'…' : prompt, dur:'60s', date:'今天', status:'done', emoji:'🎬', likes:0, published:false, project_id: job.project_id, job_id: job.id})
+      .then(() => toast('成片已生成，保存在「我的作品」'))
+      .catch(e => toast('保存作品失败: ' + e.message));
+  } else {
+    const b = job.blocker || '';
+    let hint = '可在「API Keys 配置」补全 Key 后重试。';
+    if(/creative_only/i.test(b)){
+      hint = '原因：当前为「只跑创意阶段」。<br>请把创作台左上角开关切到 <b>🎬 完整出片</b>，再重新发送消息，即可生成视频。';
+    } else if(/api key|needs an api key|not set/i.test(b)){
+      hint = '原因：缺少 LLM 或生成工具的 Key。<br>在「API Keys 配置」页填入对应 Key 保存后重试（服务器已内置 key 时无需填写）。';
+    }
+    appendMsg('ai', '⚠️ 任务未完成：<b>' + b + '</b><br>' + hint);
+  }
+}
+function failRun(msg){
+  running = false;
+  document.getElementById('sendBtn').disabled = false;
+  appendMsg('ai', '❌ ' + msg);
+}
+
+function startProgress(topic){
+  document.getElementById('progEmpty').style.display = 'none';
+  const list = document.getElementById('stageList');
+  list.style.display = 'block';
+  list.innerHTML = STAGES.map(s => `
+    <div class="stage-row wait" id="sr-${s.key}">
+      <span class="sdot">${STAGES.indexOf(s)+1}</span>
+      <div class="sinfo"><div class="t">${s.name}</div><div class="d">${s.desc}</div></div>
+      <span class="st"><span class="pill wait" id="sp-${s.key}">等待中</span></span>
+    </div>`).join('');
+  document.getElementById('meterFill').style.width = '0%';
+  document.getElementById('meterPct').textContent = '0%';
+  let idx = 0;
+  const tick = setInterval(() => {
+    if(idx >= STAGES.length){ clearInterval(tick); doneProgress(); return; }
+    const s = STAGES[idx];
+    const row = document.getElementById('sr-'+s.key);
+    const pill = document.getElementById('sp-'+s.key);
+    row.className = 'stage-row running';
+    pill.className = 'pill running'; pill.textContent = '进行中';
+    appendMsg('ai', `📌 阶段 ${idx+1}/7 · <b>${s.name}</b>：${s.desc}<div class="stage-inline">产出 <span class="artifact" style="font-family:ui-monospace,monospace;font-size:11px;background:var(--brand-soft);color:#4a6fc0;padding:1px 7px;border-radius:6px">${s.artifact}</span></div>`);
+    setTimeout(() => {
+      row.className = 'stage-row done';
+      pill.className = 'pill done'; pill.textContent = '已完成 ✓';
+      const pct = Math.round(((idx+1)/STAGES.length)*100);
+      document.getElementById('meterFill').style.width = pct+'%';
+      document.getElementById('meterPct').textContent = pct+'%';
+      idx++;
+    }, 900);
+  }, 1100);
+}
+function doneProgress(){
+  appendMsg('ai', '🎉 制作完成！成片已保存到 <b>我的作品</b>。点击左侧「我的作品」查看，或一键发布到公共广场。');
+  running = false;
+  document.getElementById('sendBtn').disabled = false;
+  const newWork = {title:'新作品 · 刚刚生成', dur:'60s', date:'今天', status:'done', emoji:'🎬', likes:0, published:false};
+  if(API.online){
+    API.createWork(newWork).then(() => toast('成片已生成，保存在「我的作品」')).catch(e => toast('保存作品失败: ' + e.message));
+  } else {
+    newWork.id = 'w'+Date.now();
+    USER_PROFILES[currentUser].works.unshift(newWork);
+    toast('成片已生成，请在「我的作品」中查看');
+  }
+}
+
+/* ================= 模板市场 ================= */
+let tplFilter = '全部';
+let tplQuick = null;   // 「立即生成」当前选中的模板
+function renderTemplates(){
+  const grid = document.getElementById('tplGrid');
+  const stat = document.getElementById('tplStat');
+  const q = (document.getElementById('tplSearch') ? document.getElementById('tplSearch').value : '').trim().toLowerCase();
+  let items = tplFilter==='全部' ? TEMPLATES : TEMPLATES.filter(t => t.cat===tplFilter);
+  if(q) items = items.filter(t => [t.name, t.desc, t.pipeline, t.cat].join(' ').toLowerCase().includes(q));
+  if(!grid) return;
+  grid.innerHTML = items.length ? items.map(t => {
+    const g = TPL_GRAD[t.cat] || grads[0];
+    return `
+    <div class="tpl-card">
+      <div class="tpl-head" style="background:${g}">
+        <span class="tpl-emoji">${t.emoji}</span>
+        <span class="tpl-cat">${t.cat}</span>
+        ${t.hot ? '<span class="tpl-hot">🔥 精选</span>' : ''}
+      </div>
+      <div class="tpl-body">
+        <div class="tt-row"><p class="tt">${t.name}</p>${t.est ? `<span class="tpl-est">⏱ ${t.est}</span>` : ''}</div>
+        <p class="td">${t.desc}</p>
+        <div class="tneed">${(t.need||[]).map(n => `<span class="tpl-need">${n}</span>`).join('')}</div>
+        <div class="tmeta">${t.meta.map(m => `<span class="tpl-meta">${m}</span>`).join('')}</div>
+        <div class="tpl-cta">
+          <button class="btn-gen" onclick="openTplQuick(${TEMPLATES.indexOf(t)})">🚀 立即生成</button>
+          <button class="btn-edit" onclick="useTemplate('${t.pipeline}','${t.name}','${(t.ex || t.prompt).replace(/'/g,"\\'")}')">✍️ 编辑后生成</button>
+        </div>
+      </div>
+    </div>`;}).join('')
+    : '<p class="cap-hint" style="grid-column:1/-1">没有匹配的模板，换个关键词试试。</p>';
+  if(stat) stat.textContent = `共 ${items.length} 个可用模板${tplFilter!=='全部' ? ' · '+tplFilter : ''}${q ? ' · 关键词「'+q+'」' : ''}`;
+}
+document.querySelectorAll('#tplTabs .g-tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('#tplTabs .g-tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  tplFilter = t.textContent.trim();
+  renderTemplates();
+}));
+function useTemplate(pipeline, name, prompt){
+  // 回创作台：预填 pipeline 与一个完整示例 prompt（不自动发送，等用户确认）
+  document.getElementById('pipelineSel').value = pipeline;
+  document.getElementById('chatInput').value = prompt;
+  document.getElementById('chatInput').focus();
+  goto('create');
+  toast('已填入「' + name + '」示例 —— 可直接点发送，或修改后发送 🧩');
+}
+function openTplQuick(i){
+  tplQuick = TEMPLATES[i];
+  document.getElementById('tplQuickName').textContent = tplQuick.emoji + ' ' + tplQuick.name;
+  document.getElementById('tplQuickMeta').innerHTML = (tplQuick.meta||[]).map(m => `<span class="tpl-meta">${m}</span>`).join('') +
+    (tplQuick.est ? `<span class="tpl-meta">⏱ ${tplQuick.est}</span>` : '');
+  document.getElementById('tplQuickInput').value = tplQuick.ex || tplQuick.prompt || '';
+  document.getElementById('tplUseMask').classList.add('show');
+  document.getElementById('tplQuickInput').focus();
+}
+function closeTplQuick(){ document.getElementById('tplUseMask').classList.remove('show'); }
+function runTplQuick(){
+  const text = document.getElementById('tplQuickInput').value.trim();
+  if(!tplQuick || !text){ toast('请先填入主题或脚本'); return; }
+  const t = tplQuick;
+  closeTplQuick();
+  // 落到创作台并立即发送：与「创作台直接输入」走同一条真实任务链路
+  document.getElementById('pipelineSel').value = t.pipeline;
+  document.getElementById('chatInput').value = text;
+  goto('create');
+  sendMsg();
+  toast('已用「' + t.name + '」创建任务 🚀 可到任务看板看进度');
+}
+
+/* ================= 作品产物 ================= */
+async function openProduct(id){
+  const body = document.getElementById('productBody');
+  document.getElementById('productMask').classList.add('show');
+  if(!API.online){
+    body.innerHTML = '<p class="cap-hint">演示模式下无真实产物。连接后端后，此处会展示 projects/ 下的成片与素材。</p>';
+    return;
+  }
+  try{
+    const d = await API._req('GET', '/api/me/works/' + id + '/product');
+    if(!d.media || !d.media.length){
+      body.innerHTML = '<p class="cap-hint">该项目还没有生成产物（可能是 creative_only 模式只跑了创意阶段，或任务未完成）。</p>';
+      return;
+    }
+    const vids = d.media.filter(m => m.type==='video');
+    const others = d.media.filter(m => m.type!=='video');
+    body.innerHTML = `
+      <div class="field-label">成片</div>
+      ${vids.length ? vids.map(v => `
+        <video controls style="width:100%;border-radius:10px;background:#0e1524" src="${v.url}"></video>
+        <div class="cap-hint" style="margin:4px 0 12px">${v.name} · ${(v.size_bytes/1048576).toFixed(1)} MB · <a href="${v.url}" target="_blank" style="color:var(--brand)">下载</a></div>`).join('')
+        : '<p class="cap-hint">无成片（未渲染）。</p>'}
+      ${others.length ? `<div class="field-label">素材与字幕</div>
+        ${others.map(o => `<div class="stage-inline" style="margin-bottom:6px"><span>${o.name}</span><a href="${o.url}" target="_blank" style="margin-left:auto;color:var(--brand);font-size:12px">下载</a></div>`).join('')}` : ''}`;
+  }catch(e){
+    body.innerHTML = '<p class="err">加载产物失败: ' + e.message + '</p>';
+  }
+}
+function closeProduct(){ document.getElementById('productMask').classList.remove('show'); }
+
+/* ================= 公共广场播放 ================= */
+function openGalleryPlay(i){
+  const g = (window._galleryItems||[])[i];
+  if(!g) return;
+  const body = document.getElementById('playBody');
+  document.getElementById('playTitle').textContent = '▶ ' + (g.title||'');
+  document.getElementById('playMask').classList.add('show');
+  const pid = g.project_id;
+  if(!pid){
+    body.innerHTML = `<p class="cap-hint">该作品未关联成片（早期演示数据）。发布时带产物（project_id）的作品才能在这里播放。</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px;background:${grads[i%grads.length]};border-radius:10px;padding:18px">
+        <span style="font-size:40px">${g.emoji||'🎬'}</span>
+        <div><b>${g.title}</b><div class="cap-hint">by ${g.author||'匿名'} · 公开</div></div>
+      </div>`;
+    return;
+  }
+  const url = '/media/' + pid + '/renders/final.mp4';
+  body.innerHTML = `
+    <video controls autoplay style="width:100%;border-radius:10px;background:#0e1524;max-height:60vh" src="${url}"></video>
+    <div class="cap-hint" style="margin:8px 0 4px">${g.title} · by ${g.author||'匿名'}</div>
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+      <a class="btn btn-primary btn-sm" href="${url}" target="_blank">📥 下载成片</a>
+      <button class="btn btn-ghost btn-sm" onclick="openProjectMedia('${pid}')">🗂 查看项目产物</button>
+    </div>`;
+  body.querySelector('video').onerror = () => {
+    body.innerHTML = '<p class="cap-hint">成片尚未渲染（/renders/final.mp4 不存在）。可在任务看板查看该项目状态。</p>';
+  };
+}
+function openProjectMedia(pid){ window.open('/board/p/' + pid, '_blank'); }
+function closePlay(){ document.getElementById('playMask').classList.remove('show'); }
+
+/* ================= 多比例导出 ================= */
+const RATIOS = [
+  {key:'9:16',  label:'9:16',  desc:'抖音 / 快手 / 视频号', cls:'w:26px;h:46px'},
+  {key:'16:9',  label:'16:9',  desc:'B站 / YouTube / 电视', cls:'w:46px;h:26px'},
+  {key:'1:1',   label:'1:1',   desc:'朋友圈 / 信息流',      cls:'w:38px;h:38px'},
+];
+let exportWorkId = null, exportRatio = '16:9';
+function openExport(id){
+  exportWorkId = id;
+  const w = USER_PROFILES[currentUser].works.find(x => x.id===id);
+  document.getElementById('exportTitle').textContent = '导出「' + (w?w.title:'') + '」';
+  document.getElementById('ratioGrid').innerHTML = RATIOS.map(r =>
+    `<div class="ratio-opt ${r.key===exportRatio?'sel':''}" onclick="pickRatio('${r.key}')">
+       <div class="shp"><i style="${r.cls}"></i></div>
+       <div class="rn">${r.label}</div><div class="rd">${r.desc}</div>
+     </div>`).join('');
+  document.getElementById('exportMask').classList.add('show');
+}
+function pickRatio(k){ exportRatio = k; document.querySelectorAll('.ratio-opt').forEach(o => o.classList.toggle('sel', o.dataset.k===k)); }
+function closeExport(){ document.getElementById('exportMask').classList.remove('show'); }
+async function doExport(){
+  closeExport();
+  const res = document.getElementById('exportRes').value.replace('（推荐）','').replace('（消耗更多算力）','');
+  if(API.online){
+    try{
+      const w = currentWorks().find(x => String(x.id)===String(exportWorkId));
+      if(!w || !w.project_id){ toast('该作品没有关联项目产物，暂不能真导出（演示模式）'); return; }
+      const d = await API._req('POST', '/api/export', {work_id: exportWorkId, ratio: exportRatio, resolution: res});
+      toast('导出完成：' + d.name + '（' + (d.size_bytes/1048576).toFixed(1) + ' MB）');
+      window.open(d.url, '_blank');
+    }catch(e){
+      toast('导出失败: ' + e.message);
+    }
+    return;
+  }
+  toast('开始导出 ' + exportRatio + ' · ' + res + '（原型演示）');
+}
+
+/* ================= AI 标题/封面/标签 ================= */
+let aiWorkId = null, aiSelTitle = 0, aiSelCover = 0, aiSelPlatform = 'gallery', aiSelTags = new Set();
+const AI_TITLE_POOL = [
+  ['这个视频我看了 3 遍！', '高互动标题 · 引发好奇'],
+  ['90 秒讲透一个知识点', '直接给价值 · 清晰定位'],
+  ['别再错过这个了，太实用', '紧迫感 · 高点击'],
+];
+const AI_TAG_POOL = ['#知识科普','#短视频','#AI生成','#涨知识','#实用技巧','#干货分享'];
+const PLATFORM_LABEL = {gallery:'公共广场', douyin:'抖音', bili:'B站', yt:'YouTube'};
+async function openAi(id){
+  aiWorkId = id; aiSelTitle = 0; aiSelCover = 0; aiSelPlatform = 'gallery'; aiSelTags = new Set(['#知识科普']);
+  document.getElementById('aiMask').classList.add('show');
+  document.getElementById('aiTitles').innerHTML = '<p class="cap-hint">AI 生成中…</p>';
+  document.getElementById('aiCovers').innerHTML = '<p class="cap-hint">生成中…</p>';
+  const w = currentWorks().find(x => String(x.id)===String(id));
+  const prompt = w ? w.title : '';
+  if(API.online && prompt){
+    try{
+      const d = await API._req('POST', '/api/ai/optimize', {prompt, api_keys: {}});
+      renderAiResult(d.titles, d.covers, d.tags);
+      return;
+    }catch(e){
+      toast('AI 生成失败，使用预设方案: ' + e.message);
+    }
+  }
+  renderAiResult(AI_TITLE_POOL, null, null);
+}
+function renderAiResult(titles, covers, tags){
+  document.getElementById('aiTitles').innerHTML = (titles||[]).map(([t,d],i) =>
+    `<div class="title-cand ${i===0?'sel':''}" onclick="pickTitle(${i})"><div class="tn">${t}</div><div class="ts">${d||'AI 生成'}</div></div>`).join('') || '<p class="cap-hint">无标题建议</p>';
+  document.getElementById('aiCovers').innerHTML = [0,1,2].map(i =>
+    `<div class="cover-opt ${i===0?'sel':''}" style="background:${grads[i%grads.length]}" onclick="pickCover(${i})" title="${(covers&&covers[i])||''}">🎬</div>`).join('');
+  aiSelTags = new Set((tags||['#知识科普']).slice(0,4));
+  renderAiTags();
+  document.querySelectorAll('#aiPlatforms .ratio-opt').forEach(o => o.classList.toggle('sel', o.dataset.p==='gallery'));
+}
+function renderAiTags(){
+  document.getElementById('aiTags').innerHTML = AI_TAG_POOL.map(t =>
+    `<span class="tag-chip ${aiSelTags.has(t)?'sel-tag':''}" style="${aiSelTags.has(t)?'background:var(--brand-soft);border-color:var(--brand);color:var(--brand-d)':''}" onclick="toggleTag('${t}')">${t}</span>`).join('');
+}
+function toggleTag(t){ if(aiSelTags.has(t)) aiSelTags.delete(t); else aiSelTags.add(t); renderAiTags(); }
+function pickTitle(i){ aiSelTitle=i; document.querySelectorAll('.title-cand').forEach((o,k)=>o.classList.toggle('sel',k===i)); }
+function pickCover(i){ aiSelCover=i; document.querySelectorAll('.cover-opt').forEach((o,k)=>o.classList.toggle('sel',k===i)); }
+function pickPlatform(el){ aiSelPlatform = el.dataset.p; document.querySelectorAll('#aiPlatforms .ratio-opt').forEach(o => o.classList.toggle('sel', o===el)); }
+function closeAi(){ document.getElementById('aiMask').classList.remove('show'); }
+async function applyAi(){
+  const title = AI_TITLE_POOL[aiSelTitle][0];
+  const tags = [...aiSelTags];
+  const platform = aiSelPlatform;
+  if(API.online){
+    try{
+      await API.patchWork(aiWorkId, {title, ai_applied:true, tags, platform, published: platform==='gallery'});
+      if(platform==='gallery') await API.patchWork(aiWorkId, {published:true});
+      closeAi(); renderWorks();
+      const pub = platform==='gallery' ? '已发布到公共广场 🌍' : '发布任务已创建（' + PLATFORM_LABEL[platform] + '）';
+      toast('✨ AI 方案已应用 · ' + pub);
+    }catch(e){ toast('发布失败: ' + e.message); }
+    return;
+  }
+  const w = mockWorks().find(x => x.id===aiWorkId);
+  if(w){ w.title = title; w.aiApplied = true; w.tags = tags; w.platform = platform; }
+  if(platform === 'gallery'){ w.published = true; w.likes = 0; }
+  closeAi(); renderWorks();
+  const pub = platform==='gallery' ? '已发布到公共广场 🌍' : '发布任务已创建（原型演示，' + PLATFORM_LABEL[platform] + '）';
+  toast('✨ AI 方案已应用 · ' + pub);
+}
+
+/* ================= 二次创作：长→短切片 ================= */
+let clipWorkId = null, clipCount = 3, clipDur = '15s';
+const CLIP_SAMPLES = [
+  ['开场钩子：3 秒抓住注意力', 92],
+  ['核心知识点：第 2 个关键结论', 87],
+  ['反转时刻：结尾彩蛋', 81],
+];
+function openClip(id){
+  clipWorkId = id; clipCount = 3; clipDur = '15s';
+  document.querySelectorAll('#clipCount .ratio-opt').forEach((o,i)=>o.classList.toggle('sel', i===0));
+  document.querySelectorAll('#clipDur .ratio-opt').forEach((o,i)=>o.classList.toggle('sel', i===0));
+  renderClipPreview();
+  document.getElementById('clipMask').classList.add('show');
+}
+function pickClipCount(el,n){ clipCount=n; document.querySelectorAll('#clipCount .ratio-opt').forEach(o=>o.classList.toggle('sel',o===el)); }
+function pickClipDur(el,d){ clipDur=d; document.querySelectorAll('#clipDur .ratio-opt').forEach(o=>o.classList.toggle('sel',o===el)); }
+function renderClipPreview(){
+  document.getElementById('clipPreview').innerHTML = CLIP_SAMPLES.map(([name,score],i) =>
+    `<div class="stage-inline" style="margin-top:0;margin-bottom:8px">
+       <span>${i+1}. ${name}</span>
+       <span class="pill running" style="background:var(--run-soft);color:var(--run)">爆款分 ${score}</span>
+     </div>`).join('');
+}
+function closeClip(){ document.getElementById('clipMask').classList.remove('show'); }
+function doClip(){
+  closeClip();
+  const w = USER_PROFILES[currentUser].works.find(x => x.id===clipWorkId);
+  const base = w ? w.title.slice(0,12) : '长视频';
+  toast('已为「' + base + '…」生成 ' + clipCount + ' 条 ' + clipDur + ' 切片（原型演示）✂️');
+}
+
+
+/* ================= 账户中心（真实余额 + 任务成本账本） ================= */
+const USD_CNY = 7.2;   // 与后端换算一致（展示用，后端已带 cny 则优先后端值）
+function _cny(usd){ return (Number(usd||0) * USD_CNY); }
+const TOOL_ZH = {apiz_video:'APIZ 视频', kling_video:'可灵视频', jimeng_video:'即梦视频', minimax_video:'MiniMax 视频',
+  apiz_image:'APIZ 生图', dashscope_image:'通义生图', pexels_image:'Pexels 素材', pixabay_image:'Pixabay 素材', placeholder:'占位图',
+  tts_dashscope:'通义配音', tts_doubao:'豆包配音', tts_elevenlabs:'ElevenLabs', tts_google:'Google TTS', tts_openai:'OpenAI TTS', tts_minimax:'MiniMax TTS'};
+function toolZh(t){ return TOOL_ZH[t] || t; }
+async function renderAccount(){
+  const hero = document.getElementById('accHero');
+  const costs = document.getElementById('accCosts');
+  const note = document.getElementById('accNote');
+  if(!API.online){
+    hero.innerHTML = '<div class="ah-main"><div class="ah-label">托管余额（¥）</div><div class="ah-balance">—</div><div class="ah-sub">演示模式 · 连接后端后展示真实余额</div></div>';
+    costs.innerHTML = '<p class="cap-hint">🧪 演示模式：连接后端后，这里按任务展示真实生成成本（视频片段/生图/配音逐条计量），托管消耗自动从余额扣。</p>';
+    return;
+  }
+  let d;
+  try{ d = await API._req('GET', '/api/me/account'); }
+  catch(e){ costs.innerHTML = '<p class="err">加载账户失败：' + e.message + '</p>'; return; }
+  document.getElementById('accBalance').textContent = '¥' + Number(d.balance_cny).toFixed(2);
+  document.getElementById('accBalanceUsd').textContent = '≈ $' + Number(d.balance_usd).toFixed(4) + ' USD';
+  document.getElementById('accSpent').textContent = '¥' + Number(d.spent_hosted_cny||0).toFixed(2);
+  document.getElementById('accByok').textContent = '¥' + _cny(d.spent_byok_usd).toFixed(2);
+  document.getElementById('accJobs').textContent = d.job_count || 0;
+  const neg = (Number(d.balance_cny)||0) < 0;
+  document.getElementById('accBalance').style.color = neg ? '#ffd9d9' : '';
+  note.innerHTML = '🪙 新用户开户送 <b>¥' + Number((d.bonus_usd||0)*USD_CNY).toFixed(0) + '</b> 体验金（已自动到账）。<b>托管消耗</b>：用了平台内置 Key 的生成（通义配音/生图/素材等）会从余额扣；<b>自有 Key</b>（BYOK）的调用费用直接走你的 Key，这里只记账不扣款。余额不足时任务仍会跑，账单按负值显示，请及时充值。';
+  if(!(d.costs||[]).length){
+    costs.innerHTML = '<p class="cap-hint">还没有任务记录。到创作台或模板市场生成一条视频，跑完后这里会出现逐条成本明细。</p>';
+    return;
+  }
+  costs.innerHTML = d.costs.map(c => {
+    const lines = (c.lines||[]).map(l => {
+      const amt = '$' + Number(l.usd).toFixed(6) + ' (¥' + _cny(l.usd).toFixed(4) + ')';
+      const cls = l.hosted ? 'hosted' : '';
+      const tag = l.hosted ? '托管' : '自有Key';
+      return `<span class="ac-line ${cls}">${toolZh(l.tool)} · ${amt} · ${tag}</span>`;
+    }).join('');
+    const totalCls = (Number(c.hosted_usd)||0) > 0 ? 'neg' : 'ok';
+    const totalTxt = Number(c.hosted_usd)>0 ? ('托管 -¥' + _cny(c.hosted_usd).toFixed(2)) : ('¥0（全走你的 Key）');
+    const time = (c.created_at||'').replace('T',' ').slice(5,16);
+    return `<div class="acc-cost">
+      <div class="ac-top">
+        <span class="ac-title">${(c.title||c.job_id||'').slice(0,50)}</span>
+        <span class="pill done">${c.pipeline||''}</span>
+        <span class="ac-pipe">${c.job_id||''}</span>
+        <span class="ac-pipe">${time}</span>
+        <span class="ac-total"><span class="${totalCls}">${totalTxt}</span></span>
+      </div>
+      ${lines ? `<div class="ac-lines">${lines}</div>` : ''}
+      <div class="ac-foot">状态 ${c.status||''} · 总计 ≈ $${Number(c.total_usd).toFixed(6)} · 自有 Key 消耗 ¥${_cny(c.byok_usd).toFixed(4)}</div>
+    </div>`;
+  }).join('');
+}
+function openRecharge(){
+  if(!API.online){ toast('演示模式不支持充值；连接后端后可体验测试充值'); return; }
+  document.getElementById('recharInput').value = '50';
+  document.getElementById('recharMask').classList.add('show');
+}
+function closeRecharge(){ document.getElementById('recharMask').classList.remove('show'); }
+async function rechargeSubmit(){
+  const rmb = parseFloat(document.getElementById('recharInput').value);
+  if(!(rmb > 0)){ toast('请输入有效金额'); return; }
+  try{
+    const d = await API._req('POST', '/api/me/recharge', {amount_usd: +(rmb/USD_CNY).toFixed(4)});
+    closeRecharge();
+    toast('充值成功：¥' + rmb.toFixed(2) + ' 已入账（测试通道）✅');
+    renderAccount();
+    refreshSideBalance();
+  }catch(e){ toast('充值失败: ' + e.message); }
+}
+async function refreshSideBalance(){
+  if(!API.online) return;
+  try{
+    const d = await API._req('GET', '/api/me/account');
+    const el = document.getElementById('sideBalance');
+    if(el) el.textContent = '托管余额 ¥' + Number(d.balance_cny).toFixed(2) + ' · 点击查看';
+    const tb = document.getElementById('topBalance');
+    if(tb) tb.textContent = '¥' + Number(d.balance_cny).toFixed(2);
+  }catch(_){ /* 静默：侧栏非关键路径 */ }
+}
+
+/* ================= 我的作品（API 优先，mock 回退） ================= */
+let apiWorksCache = [];
+function mockWorks(){ return USER_PROFILES[currentUser].works; }
+function currentWorks(){
+  return API.online ? apiWorksCache : mockWorks();
+}
+/* 作品封面：有 poster（相对项目路径）就渲染图片，加载失败自动移除露出 emoji 兜底 */
+function workCoverHTML(w){
+  if(w && w.poster && w.project_id){
+    return `<img class="cover" src="/media/${w.project_id}/${w.poster}" loading="lazy" onerror="this.remove()" alt="">`;
+  }
+  return '';
+}
+async function renderWorks(){
+  const grid = document.getElementById('myWorksGrid');
+  let works;
+  if(API.online){
+    try{ works = await API.getWorks(); apiWorksCache = works; }
+    catch(e){ works = apiWorksCache; toast('加载作品失败: ' + e.message); }
+  } else {
+    works = mockWorks();
+  }
+  grid.innerHTML = (works||[]).map((w,i) => `
+    <div class="wcard">
+      <div class="thumb" style="background:${grads[i%grads.length]};cursor:pointer" onclick="openProduct('${w.id}')" title="点击播放">
+        ${workCoverHTML(w)}
+        <span>${w.emoji||'🎬'}</span>
+        ${w.status==='running' ? '<span class="badge-top"><span class="pill running">制作中</span></span>' : ''}
+        <span class="play" onclick="event.stopPropagation();openProduct('${w.id}')">▶</span>
+      </div>
+      <div class="wbody">
+        <p class="wt">${w.title}</p>
+        <div class="wm"><span>⏱ ${w.dur||'60s'}</span><span>📅 ${w.date||''}</span>${w.published?'<span style="color:var(--ok)">🌍 已发布</span>':''}${w.ai_applied||w.aiApplied?'<span style="color:var(--brand-d)">✨ AI优化</span>':''}</div>
+        <div class="wops">
+          <button class="btn btn-ghost btn-sm" onclick="openProduct('${w.id}')">🎬 产物</button>
+          <button class="btn btn-ghost btn-sm" onclick="openExport('${w.id}')">📤 导出</button>
+          ${w.dur && parseInt(w.dur)>45 ? `<button class="btn btn-ghost btn-sm" onclick="openClip('${w.id}')">✂️ 切片</button>` : ''}
+          ${w.published
+            ? `<button class="btn btn-ghost btn-sm" onclick="unpublishWork('${w.id}')">下架</button>`
+            : `<button class="btn btn-primary btn-sm" onclick="openAi('${w.id}')">🚀 发布</button>`}
+        </div>
+      </div>
+    </div>`).join('') || '<p class="cap-hint">还没有作品。去创作台发一条需求试试 →</p>';
+}
+async function publishWork(id){
+  if(API.online){
+    try{ await API.patchWork(id, {published:true}); toast('已发布到公共广场 🌍'); renderWorks(); }
+    catch(e){ toast('发布失败: ' + e.message); }
+    return;
+  }
+  const w = mockWorks().find(x => x.id===id);
+  if(w){ w.published = true; w.likes = 0; toast('「' + w.title.slice(0,12) + '…」已发布到公共广场 🌍'); renderWorks(); }
+}
+async function unpublishWork(id){
+  if(API.online){
+    try{ await API.patchWork(id, {published:false}); toast('已从公共广场下线'); renderWorks(); }
+    catch(e){ toast('下架失败: ' + e.message); }
+    return;
+  }
+  const w = mockWorks().find(x => x.id===id);
+  if(w){ w.published = false; toast('「' + w.title.slice(0,12) + '…」已从公共广场下线'); renderWorks(); }
+}
+
+/* ================= 公共广场（API 优先） ================= */
+async function renderGallery(){
+  const grid = document.getElementById('galleryGrid');
+  let seed;
+  if(API.online){
+    try{
+      const g = await API.getGallery();
+      seed = g.map(w => ({title:w.title, emoji:w.emoji||'🎬', author:w.author||'匿名', likes:w.likes||0, views:((w.likes||0)*37)+'00', tag:'新发布', project_id:w.project_id||null, poster:w.poster||null}));
+    }catch(e){ seed = []; toast('加载广场失败: ' + e.message); }
+  } else {
+    seed = gallerySeed.slice();
+    // 把各用户已发布的作品并入广场（只含 published 的，体现"公共区=发布才可见"）
+    Object.entries(USER_PROFILES).forEach(([u, p]) => p.works.filter(w => w.published).forEach(w =>
+      seed.unshift({title:w.title, emoji:w.emoji, author:u, likes:w.likes, views:(w.likes*37)+'00', tag:'新发布'})));
+  }
+  // 去重
+  const seen = new Set(); const items = [];
+  (seed||[]).forEach(s => { const k = s.title; if(!seen.has(k)){ seen.add(k); items.push(s); } });
+  window._galleryItems = items;
+  grid.innerHTML = items.map((g,i) => `
+    <div class="wcard gcard">
+      <div class="thumb" style="background:${grads[i%grads.length]};cursor:pointer" onclick="openGalleryPlay(${i})" title="点击播放">
+        ${workCoverHTML(g)}
+        <span>${g.emoji}</span><span class="play" onclick="event.stopPropagation();openGalleryPlay(${i})">▶</span>
+        <span class="badge-top"><span class="pill done">${g.tag}</span></span>
+      </div>
+      <div class="wbody">
+        <p class="wt">${g.title}</p>
+        <div class="author"><div class="avatar">${g.author[0]}</div><div><div class="an">${g.author}</div><div class="al">3 小时前 · 公开</div></div></div>
+        <div class="stats">
+          <button class="btn-like" onclick="like(this)">❤️ <span>${g.likes}</span></button>
+          <span>👁 ${g.views}</span>
+          <span>💬 ${Math.max(1, Math.round(g.likes/9))}</span>
+        </div>
+      </div>
+    </div>`).join('') || '<p class="cap-hint">广场还是空的——把你的作品发布上来吧！</p>';
+}
+function like(btn){ btn.classList.toggle('liked'); const s = btn.querySelector('span'); s.textContent = btn.classList.contains('liked') ? (+s.textContent+1) : (+s.textContent-1); }
+document.querySelectorAll('.g-tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.g-tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); toast('筛选「'+t.textContent.replace(/^\S+/,'').replace('】','')+'」（原型演示）');
+}));
+
+/* ================= 设置 / Key（按用户隔离） ================= */
+function renderKeys(){
+  const root = document.getElementById('keysRoot');
+  // API 模式：账户级 BYOK —— 填写的 key 保存到我的账户，提交任务自动使用
+  if(API.online){
+    loadAccountKeys(root);
+    return;
+  }
+  const p = USER_PROFILES[currentUser];
+  root.innerHTML = p.keys.map(g => `
+    <div class="set-card">
+      <h3>${g.group}</h3><p class="sub">${g.desc}</p>
+      ${g.rows.map(r => `
+        <div class="key-row">
+          <span class="dot ${r.on?'on':'off'}"></span>
+          <div class="ki"><b>${r.name}</b><span>${r.desc}</span></div>
+          <input ${r.on?'disabled':'placeholder="点击填写你的 Key…"'} value="${r.on?r.val:''}">
+          <span class="status ${r.on?'ok':'miss'}">${r.on?'✓':'未配'}</span>
+        </div>`).join('')}
+    </div>`).join('')
+    + `<div class="set-card">
+         <h3>🛡️ 安全说明</h3><p class="sub">BYOK 模型的关键设计</p>
+         <div style="font-size:13px;color:#4a5568;line-height:1.7">
+           · Key 仅在你账户下加密存储，任务运行时注入，绝不落日志<br>
+           · 每个 Key 可独立管理、随时吊销<br>
+           · 你的用量只计你自己的 Key，平台不代付<br>
+           · 建议设置「月度用量上限」，防止 Key 被盗刷
+         </div>
+       </div>`;
+}
+
+/* ---- 账户级 key 配置（API 模式）：LLM 单 key 区 + 视频/语音/图片能力路由 ----
+   get     = 官方申请入口（新标签打开）
+   noTest  = 后端暂不支持连通性探测（隐藏 🔌 测试按钮）                          */
+const LLM_KEY_FIELDS = [
+  {group:'🧠 创意 LLM', env:'MINIMAX_API_KEY', name:'MiniMax（海螺）', hint:'系统默认创意模型', get:'https://platform.minimax.io/'},
+  {group:'🧠 创意 LLM', env:'OPENAI_API_KEY', name:'OpenAI', hint:'创意/脚本/分镜；同 Key 可作 TTS/图像', get:'https://platform.openai.com/api-keys'},
+  {group:'🧠 创意 LLM', env:'DASHSCOPE_API_KEY', name:'阿里百炼 Qwen', hint:'LLM + qwen-tts 配音 + 生图（服务器已内置，可覆盖）', get:'https://bailian.console.aliyun.com/'},
+  {group:'🧠 创意 LLM', env:'ANTHROPIC_API_KEY', name:'Anthropic Claude', hint:'备选创意模型', get:'https://console.anthropic.com/'},
+  {group:'🧠 创意 LLM', env:'GEMINI_API_KEY', name:'Google Gemini', hint:'备选创意模型', get:'https://aistudio.google.com/apikey'},
+];
+/* 能力路由模型目录：id 与后端 DEFAULT_MODEL_PREFS / renderer 路由一致。
+   APIZ 单 Key 即可：视频与图片共用同一 APIZ_API_KEY（各自卡片分别控制开关与优先级） */
+const MODEL_CATALOG = {
+  video: { label:'🎥 视频生成', models: {
+    apiz:    {name:'APIZ 聚合', hint:'MiniMax/即梦等聚合源', env:'APIZ_API_KEY', get:'https://apiz.ai/#/?ref=8WEB6F03'},
+    kling:   {name:'可灵 Kling', hint:'官方直连', env:'KLING_API_KEY', get:'https://app.klingai.com/', noTest:true},
+    jimeng:  {name:'火山即梦', hint:'另需 VOLC_SECRETKEY', env:'VOLC_ACCESSKEY', get:'https://console.volcengine.com/iam/keymanage', noTest:true},
+    minimax: {name:'MiniMax 直连', hint:'官方 API', env:'MINIMAX_API_KEY', get:'https://platform.minimax.io/'},
+  }},
+  voice: { label:'🗣️ 语音合成', models: {
+    dashscope: {name:'百炼 qwen-tts', hint:'服务器内置兜底', env:'DASHSCOPE_API_KEY', get:'https://bailian.console.aliyun.com/'},
+    doubao:    {name:'豆包语音', hint:'音色库大、支持声音复刻', env:'DOUBAO_SPEECH_API_KEY', get:'https://console.volcengine.com/speech/app', noTest:true},
+    elevenlabs:{name:'ElevenLabs', hint:'真人感', env:'ELEVENLABS_API_KEY', get:'https://elevenlabs.io/api-keys', noTest:true},
+    google:    {name:'Google TTS', hint:'700+ 音色', env:'GOOGLE_API_KEY', get:'https://aistudio.google.com/apikey', noTest:true},
+    openai:    {name:'OpenAI TTS', hint:'复用 OpenAI Key', env:'OPENAI_API_KEY', get:'https://platform.openai.com/api-keys'},
+  }},
+  image: { label:'🎨 图像生成', models: {
+    apiz:      {name:'APIZ 生图', hint:'gpt-image-2（与视频共用 Key）', env:'APIZ_API_KEY', get:'https://apiz.ai/#/?ref=8WEB6F03'},
+    dashscope: {name:'百炼 qwen-image', hint:'阿里通义万相', env:'DASHSCOPE_API_KEY', get:'https://bailian.console.aliyun.com/'},
+    pexels:    {name:'Pexels 素材', hint:'免费图片/视频', env:'PEXELS_API_KEY', get:'https://www.pexels.com/api/'},
+    pixabay:   {name:'Pixabay 素材', hint:'免费图片/视频/音乐', env:'PIXABAY_API_KEY', get:'https://pixabay.com/api/docs/'},
+  }},
+};
+/* 前端默认 prefs（与后端 DEFAULT_MODEL_PREFS 对齐，GET /api/me/prefs 失败时兜底） */
+const DEFAULT_PREFS_UI = {
+  video:  {models:['apiz','kling','jimeng','minimax'],        enabled:{apiz:true, kling:false, jimeng:false, minimax:false}, apiz_keys:[]},
+  voice:  {models:['dashscope','doubao','elevenlabs','google','openai'], enabled:{dashscope:true, doubao:false, elevenlabs:false, google:false, openai:false}, apiz_keys:[]},
+  image:  {models:['apiz','dashscope','pexels','pixabay'],    enabled:{apiz:true, dashscope:false, pexels:true, pixabay:false}, apiz_keys:[]},
+};
+let accountKeys = {};
+let modelPrefs = null;      // 能力路由偏好（已加载/默认）
+let keyDraft = {};          // 未保存的 key 输入草稿（env->value，重渲染回填）
+async function loadAccountKeys(root){
+  try{
+    const d = await API._req('GET', '/api/me/keys');
+    accountKeys = {};
+    d.keys.forEach(k => accountKeys[k] = '');
+  }catch(e){ accountKeys = {}; }
+  try{
+    const p = await API._req('GET', '/api/me/prefs');
+    modelPrefs = (p && p.prefs) ? p.prefs : null;
+  }catch(e){ modelPrefs = null; }
+  if(!modelPrefs) modelPrefs = JSON.parse(JSON.stringify(DEFAULT_PREFS_UI));
+  root.innerHTML = `
+    <div class="set-card" style="grid-column:1/-1;border:1px solid rgba(43,109,232,.35);background:linear-gradient(135deg,#eef3fb,#f6f8fe)">
+      <h3 style="color:#2b6de8">🎛️ 能力路由：视频 / 语音 / 图片 用哪个模型，你来定</h3>
+      <p class="sub" style="margin:4px 0 0">每个能力可<b>勾选启用多个模型</b>，用 ↑↓ 调整<b>调用优先级</b>（按顺序用，失败自动降级下一个）。🔗 获取 = 官方申请页（APIZ 带推荐码）。LLM 单 Key、服务器内置（minimax/qwen-tts/素材）不受影响。</p>
+    </div>
+    <div class="set-card" style="grid-column:1/-1">
+      <h3>🎛️ 我的模型路由配置</h3>
+      <p class="sub">改动实时暂存，点「💾 保存配置」生效。提交任务时按此顺序路由调用。</p>
+      <div id="capPrefs"></div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+        <button class="btn btn-primary btn-sm" onclick="saveModelConfig()">💾 保存配置</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetModelConfig()">↺ 恢复默认</button>
+        <span class="cap-hint">Key 值不回显；保存后提交任务自动附加</span>
+      </div>
+    </div>
+    <div class="set-card" style="grid-column:1/-1">
+      <h3>🧠 创意 LLM（单 Key）</h3>
+      <p class="sub">负责写脚本/分镜；DASHSCOPE 同时是服务器内置 TTS/生图的 key。</p>
+      ${LLM_KEY_FIELDS.map(f => `
+        <div class="key-row">
+          <span class="dot ${accountKeys[f.env]!==undefined?'on':'off'}"></span>
+          <div class="ki"><b>${f.name}</b><span>${f.hint} · ${f.env}</span></div>
+          <input type="password" id="acctKey_${f.env}" placeholder="${accountKeys[f.env]!==undefined?'已配置（留空保持不变 / 填新值覆盖）':'填写你的 '+f.env}">
+          ${f.get?`<a href="${f.get}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="white-space:nowrap;text-decoration:none">🔗 获取</a>`:''}
+          <button class="btn btn-ghost btn-sm" style="white-space:nowrap" onclick="testAccountKey('${f.env}')" id="testBtn_${f.env}">🔌 测试</button>
+          <span class="key-test" id="keyTest_${f.env}"></span>
+        </div>`).join('')}
+    </div>
+    <div class="set-card" style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <h3 style="margin:0 0 2px">🛠️ 服务器工具状态</h3>
+        <p class="sub" style="margin:0">各能力分组下已配置的工具（来自 /api/tools 实时探测）</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="white-space:nowrap" onclick="goto('tools')">查看详情 →</button>
+    </div>`;
+  renderCapPrefs();
+}
+
+/* ---------- 能力路由配置 UI ---------- */
+function renderCapPrefs(){
+  const host = document.getElementById('capPrefs');
+  if(!host) return;
+  host.innerHTML = Object.keys(MODEL_CATALOG).map(cap => {
+    const cat = MODEL_CATALOG[cap];
+    const st = modelPrefs[cap] || {models:Object.keys(cat.models), enabled:{}, apiz_keys:[]};
+    const rows = st.models.map((mid, idx) => {
+      const m = cat.models[mid];
+      if(!m) return '';
+      const on = !!st.enabled[mid];
+      const first = idx === 0, last = idx === st.models.length - 1;
+      const hasKey = accountKeys[m.env] !== undefined;
+      return `
+        <div class="key-row" style="border:1px solid ${on?'rgba(18,161,80,.4)':'var(--line)'};background:${on?'#f5fdf7':'transparent'};border-radius:10px;margin:6px 0;padding:8px 10px;display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center">
+          <label style="display:flex;align-items:center;gap:10px;min-width:0">
+            <input type="checkbox" ${on?'checked':''} onchange="capToggle('${cap}','${mid}',this.checked)" style="width:16px;height:16px;accent-color:#12a150;flex-shrink:0">
+            <span style="display:flex;flex-direction:column;min-width:0">
+              <b style="font-size:13px">${on?'🟢':'⚪'} ${m.name}</b>
+              <span style="font-size:11px;color:#64748b">${m.hint} · ${m.env} ${hasKey?'· 已填':'· 未填 key'}</span>
+            </span>
+          </label>
+          ${m.get?`<a href="${m.get}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="white-space:nowrap;text-decoration:none">🔗 获取</a>`:''}
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <button class="btn btn-ghost btn-sm" style="padding:2px 8px" onclick="capMove('${cap}',${idx},-1)" ${first?'disabled':''}>↑</button>
+            <button class="btn btn-ghost btn-sm" style="padding:2px 8px" onclick="capMove('${cap}',${idx},1)" ${last?'disabled':''}>↓</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="password" data-keyenv="${m.env}" value="${keyDraft[m.env]||''}" oninput="draftKeyEnv(this)" placeholder="${hasKey?'已配置（留空不变/填新覆盖）':'填写 '+m.env}" style="min-width:150px;max-width:210px">
+            ${m.noTest?''
+              :`<button class="btn btn-ghost btn-sm" style="white-space:nowrap" onclick="testModelKey(this,'${m.env}')">🔌 测试</button>
+                <span class="kt" style="font-size:11px;color:#64748b;min-width:80px"></span>`}
+          </div>
+        </div>`;
+    }).join('');
+    const onCount = st.models.filter(m => st.enabled[m]).length;
+    return `
+      <div style="margin:14px 0 6px;display:flex;align-items:center;gap:8px">
+        <b style="font-size:14px">${cat.label}</b>
+        <span style="font-size:11px;color:#64748b">启用 ${onCount}/${st.models.length} 个 · 按顺序调用，失败自动降级</span>
+      </div>
+      ${rows}`;
+  }).join('');
+}
+function draftKeyEnv(el){ if(el && el.dataset.keyenv) keyDraft[el.dataset.keyenv] = el.value; }
+function capToggle(cap, mid, on){
+  if(!modelPrefs[cap]) return;
+  modelPrefs[cap].enabled[mid] = on;
+  renderCapPrefs();
+}
+function capMove(cap, idx, dir){
+  const st = modelPrefs[cap]; if(!st) return;
+  const j = idx + dir;
+  if(j < 0 || j >= st.models.length) return;
+  const arr = st.models;
+  [arr[idx], arr[j]] = [arr[j], arr[idx]];
+  renderCapPrefs();
+}
+async function saveModelConfig(){
+  try{
+    const payload = {};
+    // 能力路由卡：各模型行的 key 输入（APIZ 视频/图片共用同一 APIZ_API_KEY）
+    document.querySelectorAll('#capPrefs [data-keyenv]').forEach(inp => {
+      const v = inp.value.trim();
+      if(v) payload[inp.dataset.keyenv] = v;
+    });
+    // 创意 LLM 卡：acctKey_* 输入
+    document.querySelectorAll('#keysRoot [id^="acctKey_"]').forEach(inp => {
+      const v = inp.value.trim();
+      if(v) payload[inp.id.replace('acctKey_','')] = v;
+    });
+    if(Object.keys(payload).length){
+      await API._req('PUT', '/api/me/keys', {api_keys: payload});
+    }
+    await API._req('PUT', '/api/me/prefs', {prefs: modelPrefs});
+    keyDraft = {};
+    toast('✅ 配置已保存，后续任务按此顺序路由');
+    loadAccountKeys(document.getElementById('keysRoot'));
+  }catch(e){ toast('保存失败: ' + e.message); }
+}
+async function resetModelConfig(){
+  modelPrefs = JSON.parse(JSON.stringify(DEFAULT_PREFS_UI));
+  keyDraft = {};
+  renderCapPrefs();
+  toast('已恢复默认（点 💾 保存后生效）');
+}
+
+/* ---- 服务器工具状态页（独立页面，来自 /api/tools 实时探测） ---- */
+async function renderToolsPage(){
+  const root = document.getElementById('toolsRoot');
+  if(!root) return;
+  if(!API.online){
+    root.innerHTML = '<div class="set-card" style="grid-column:1/-1"><h3>🧪 演示模式</h3><p class="sub" style="margin:0">当前未连接后端（/api/health 不可用），服务器工具状态仅在在线模式下可探测。</p></div>';
+    return;
+  }
+  root.innerHTML = '<div class="set-card" style="grid-column:1/-1"><p class="sub" style="margin:0">探测中…</p></div>';
+  try{
+    const d = await API._req('GET', '/api/tools');
+    const caps = d.capabilities || {};
+    const order = d.capability_order || Object.keys(caps);
+    const cards = order.map(cap => {
+      const g = caps[cap];
+      if(!g || !g.label) return '';
+      const pct = g.total ? Math.round((g.configured||0)/g.total*100) : 0;
+      const avail = (g.available || []).map(t => {
+        const on = !!t.server_configured;
+        return `<div class="key-row" style="padding:6px 0">
+          <span class="dot ${on?'on':'off'}"></span>
+          <div class="ki"><b>${t.name}</b><span>${t.provider||''}${t.missing_keys&&t.missing_keys.length? ' · 缺 ' + t.missing_keys.join(','):''}</span></div>
+          <span class="status ${on?'ok':'miss'}">${on?'✓':'未配'}</span>
+        </div>`;
+      }).join('');
+      const unavailCount = (g.unavailable||[]).length;
+      const unavail = (g.unavailable || []).map(t =>
+        `<div class="key-row" style="padding:5px 0;opacity:.65">
+          <span class="dot off"></span>
+          <div class="ki"><b>${t.name}</b><span>${t.provider||''}${t.missing_keys&&t.missing_keys.length? ' · 缺 ' + t.missing_keys.join(','):''}</span></div>
+          <span class="status miss">未接入</span>
+        </div>`).join('');
+      const pctColor = pct>=100 ? '#12a150' : (pct>=60 ? '#2b6de8' : '#e8a23d');
+      return `<div class="set-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <h3 style="margin:0;font-size:14px">${g.label}</h3>
+          <span class="cap-hint" style="margin-left:auto">${g.configured||0}/${g.total||0} 已配</span>
+        </div>
+        <div style="flex:1;height:6px;background:#edf0f5;border-radius:3px;overflow:hidden;margin:6px 0 4px">
+          <div style="height:100%;width:${pct}%;background:${pctColor};transition:width .3s"></div>
+        </div>
+        ${avail || '<p class="cap-hint" style="margin:4px 0">无可用工具</p>'}
+        ${unavailCount? `<details style="margin-top:6px"><summary style="font-size:12px;color:#8b96a8;cursor:pointer">${unavailCount} 个未接入（点击展开）</summary>${unavail}</details>`:''}
+      </div>`;
+    }).join('');
+    const llmOn = d.llm && d.llm.server_configured;
+    const llmCard = `<div class="set-card" style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <h3 style="margin:0 0 2px">🧠 创意 LLM</h3>
+        <p class="sub" style="margin:0">写脚本 / 分镜 / 调研（服务器侧配置，${(d.llm&&d.llm.providers||[]).join(' / ')}）</p>
+      </div>
+      <span class="status ${llmOn?'ok':'miss'}" style="width:auto;font-size:13px">${llmOn?'✓ 服务器已内置':'未配置'}</span>
+    </div>`;
+    root.innerHTML = cards
+      ? llmCard + cards
+      : '<div class="set-card" style="grid-column:1/-1"><p class="sub" style="margin:0">无工具信息</p></div>';
+  }catch(e){
+    root.innerHTML = '<div class="set-card" style="grid-column:1/-1"><h3>⚠️ 加载失败</h3><p class="sub" style="margin:0">' + e.message + '</p></div>';
+  }
+}
+
+/* ---- BYOK 连通性测试 ---- */
+async function testAccountKey(env){
+  const btn = document.getElementById('testBtn_' + env);
+  const res = document.getElementById('keyTest_' + env);
+  const inp = document.getElementById('acctKey_' + env);
+  if(!btn || !res) return;
+  btn.disabled = true; btn.textContent = '测试中…';
+  res.innerHTML = '<span style="color:#8b96a8">探测中…</span>';
+  try{
+    const d = await API._req('POST', '/api/me/keys/test', {env: env, value: inp ? inp.value : ''});
+    if(d.ok){
+      res.innerHTML = '<span style="color:var(--ok);font-weight:700">✓ 连通正常</span>';
+      toast(env + '：' + d.message);
+    } else {
+      res.innerHTML = '<span style="color:var(--bad);font-weight:700" title="' + (d.message||'').replace(/"/g,'&quot;') + '">✗ 失败</span>';
+      toast(env + ' 测试失败：' + (d.message||'未知错误'));
+    }
+  }catch(e){
+    res.innerHTML = '<span style="color:var(--bad);font-weight:700">✗ 请求失败</span>';
+    toast('测试请求失败: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = '🔌 测试';
+}
+
+/* ---- 能力路由卡内 key 连通性测试（与创意 LLM 一致） ---- */
+async function testModelKey(btn, env){
+  const row = btn ? btn.closest('.key-row') : null;
+  const inp = row ? row.querySelector('[data-keyenv="'+env+'"]') : null;
+  const res = row ? row.querySelector('.kt') : null;
+  if(!btn || !res) return;
+  btn.disabled = true; btn.textContent = '测试中…';
+  res.textContent = '探测中…'; res.style.color = '#8b96a8';
+  try{
+    const d = await API._req('POST', '/api/me/keys/test', {env: env, value: inp ? inp.value.trim() : ''});
+    if(d.ok){
+      res.textContent = '✓ 连通正常'; res.style.color = '#12a150';
+      toast(env + '：' + (d.message||'连通正常'));
+    } else {
+      res.textContent = '✗ 失败'; res.style.color = '#e11d48';
+      toast(env + ' 测试失败：' + (d.message||'未知错误'));
+    }
+  }catch(e){
+    res.textContent = '✗ 请求失败'; res.style.color = '#e11d48';
+    toast('测试请求失败: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = '🔌 测试';
+}
+
+/* ================= 任务看板（整合 /board/） ================= */
+const STAGE_ZH = {research:'调研', proposal:'提案', script:'脚本', scene_plan:'分镜', assets:'素材', edit:'剪辑', compose:'合成', publish:'发布'};
+async function renderBoard(force){
+  const root = document.getElementById('boardRoot');
+  if(!API.online){
+    root.innerHTML = '<p class="cap-hint">🧪 演示模式：连接后端后此处显示全部生成任务与阶段进度（也可直接访问 /board/）。</p>';
+    return;
+  }
+  if(force) root.innerHTML = '<p class="cap-hint">刷新中…</p>';
+  try{
+    const d = await API._req('GET', '/api/projects');
+    const ps = d.projects || [];
+    if(!ps.length){ root.innerHTML = '<p class="cap-hint">暂无任务。到创作台发一条需求，就会在这里实时看到 8 阶段进度。</p>'; return; }
+    root.innerHTML = ps.map(p => boardCard(p)).join('');
+  }catch(e){
+    root.innerHTML = '<p class="cap-hint">加载看板失败：' + e.message + '</p>';
+  }
+}
+function boardCard(p){
+  const st = p.stage_states || [];
+  const zh = name => STAGE_ZH[name] || name;
+  const cls = s => s.status==='completed' ? 'pill done' : s.status==='running' ? 'pill running' : s.status==='blocked' ? 'pill bad' : 'pill wait';
+  const lbl = s => s.status==='completed' ? '✓' : s.status==='running' ? '…' : s.status==='blocked' ? '✗' : '·';
+  const badges = st.map(s => `<span class="pill ${cls(s)}" style="font-size:10px;padding:2px 7px">${lbl(s)} ${zh(s.name)}</span>`).join('');
+  const done = st.filter(s => s.status==='completed').length;
+  const total = Math.max(st.length, 1);
+  const pct = Math.round(done/total*100);
+  const live = p.live ? '<span class="pill running" style="font-size:10px">运行中</span>'
+            : p.awaiting_human ? '<span class="pill bad" style="font-size:10px">待处理</span>'
+            : '<span class="pill done" style="font-size:10px">完成</span>';
+  const poster = p.poster
+    ? `<img src="/media/${p.project_id}/${p.poster}" style="width:100%;height:130px;object-fit:cover;display:block">`
+    : `<div style="height:130px;background:linear-gradient(140deg,#e6f1fb,#f4f7fb);display:flex;align-items:center;justify-content:center;color:#8b96a8;font-size:28px">🎬</div>`;
+  const ago = p.last_activity ? Math.max(1, Math.round((Date.now()/1000 - p.last_activity)/60)) + ' 分钟前' : '';
+  return `
+  <div class="wcard" style="overflow:hidden">
+    <div style="position:relative">${poster}</div>
+    <div class="wbody">
+      <p class="wt" style="margin-bottom:6px;font-size:13px">${(p.title||p.project_id).slice(0,28)}</p>
+      <div class="wm" style="margin-bottom:8px;flex-wrap:wrap"><span>${p.pipeline_type||''}</span>${live}<span>${ago}</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${badges || '<span class="cap-hint">无阶段信息</span>'}</div>
+      <div style="height:6px;background:#edf0f5;border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${pct>=100?'#12a150':'#2b6de8'};border-radius:3px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#8b96a8"><span>${done}/${total} 阶段</span><span>${pct}%</span></div>
+      <div style="margin-top:10px">
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="openBoardProject('${p.project_id}')">查看项目详情 ↗</button>
+      </div>
+    </div>
+  </div>`;
+}
+function openBoardProject(pid){ window.open('/board/p/' + pid, '_blank'); }
+/* 看板页可见时每 5s 自动刷新 */
+setInterval(() => {
+  const page = document.getElementById('page-board');
+  if(page && !page.classList.contains('hidden') && API.online) renderBoard();
+}, 5000);
+
+/* ================= 切换用户（仅 mock 模式；API 模式真实多用户登录） ================= */
+function switchUser(name, opts={}){
+  if(API.online){ toast('API 模式下使用真实账户登录，无需切换'); return; }
+  if(!USER_PROFILES[name]) name = '纲哥';
+  currentUser = name;
+  const p = USER_PROFILES[name];
+  document.getElementById('sideName').textContent = name;
+  document.getElementById('sideAvatar').textContent = name[0];
+  document.querySelector('.side-user .uplan').textContent = '托管余额 · 演示模式';
+  document.querySelector('.top-credit b').textContent = '¥—';
+  renderWorks(); renderGallery(); renderKeys();
+  if(!opts.silent) toast('已切换到「' + name + '」的账户 —— 作品 / Key 完全切换，用户间完全隔离 🔒');
+  if(opts.jump !== false) goto('works');
+}
+
+/* ================= toast ================= */
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* init */
+(function(){
+  // 创作模式开关：勾选 = 只跑创意（快）；默认 = 完整出片
+  const co = document.getElementById('creativeOnly');
+  if(co){
+    const lbl = document.getElementById('creativeOnlyLabel');
+    const sync = () => { lbl.textContent = co.checked ? '⚡ 只跑创意阶段（快）' : '🎬 完整出片（约 5-7 分钟）'; };
+    co.addEventListener('change', sync);
+  }
+})();
+(async function initApp(){
+  await API.init();
+  renderGallery();
+  /* [修复] 刷新后恢复登录会话：token 有效 → 直接进应用并回到上次页面（不再跳登录） */
+  if(API.online && API.user){
+    currentUser = API.user.username;
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    applyUserIdentity();
+    const saved = localStorage.getItem('om_page');
+    goto(PAGES.includes(saved) ? saved : 'create');
+    toast('欢迎回来，' + currentUser + '！');
+  } else if(!API.online){
+    /* mock 演示模式：记住的登录用户直接恢复 */
+    const mu = localStorage.getItem('om_mock_user');
+    if(mu && USER_PROFILES[mu]){
+      currentUser = mu;
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appView').classList.remove('hidden');
+      const saved = localStorage.getItem('om_page');
+      goto(PAGES.includes(saved) ? saved : 'create');
+      toast('欢迎回来，' + currentUser + '！');
+    }
+  }
+  /* ?direct=xxx 跳过登录直达页面（演示截图用；API 在线时直跳会先建一个演示会话） */
+  const direct = new URLSearchParams(location.search).get('direct');
+  if(direct && PAGES.includes(direct)){
+    if(API.online){
+      try{
+        if(!API.user){
+          // 自动登录/创建演示账号，保证直跳页面能拿到真数据
+          try{ await API.login('demo@openmontage.dev','demo1234'); }
+          catch(e){ await API.register('demo','demo@openmontage.dev','demo1234','专业版'); }
+        }
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('appView').classList.remove('hidden');
+        applyUserIdentity();
+      }catch(e){ /* 后端异常则留在登录页 */ }
+    } else {
+      doLogin({preventDefault:()=>{}});
+    }
+    goto(direct);
+  }
+  /* ?user=阿玲 直接切换账户（仅 mock 模式；API 模式忽略） */
+  const u = new URLSearchParams(location.search).get('user');
+  if(u && !API.online) switchUser(u, {silent:false, jump:false});
+})();
+</script>
+</body>
+</html>

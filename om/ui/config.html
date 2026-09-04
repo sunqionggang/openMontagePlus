@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenMontage · 自助配置台</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#ffffff; --line:#e2e8f0; --text:#1a202c; --muted:#64748b;
+    --brand:#1a73e8; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.5}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:16px 0;position:sticky;top:0;z-index:5}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header .wrap{display:flex;align-items:center;gap:16px}
+  h1{font-size:1.25rem;margin:0}
+  h1 small{color:var(--muted);font-weight:400;font-size:.8rem;margin-left:8px}
+  .badge{padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:600}
+  .badge.ok{background:#dcfce7;color:var(--ok)}
+  .badge.warn{background:#fef3c7;color:var(--warn)}
+  .badge.bad{background:#fee2e2;color:var(--bad)}
+  .nav{margin-left:auto;display:flex;gap:12px}
+  .nav a{color:var(--brand);text-decoration:none;font-size:.85rem}
+  main{padding:24px 0 60px}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:18px}
+  .card h2{font-size:1rem;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .card .sub{color:var(--muted);font-size:.8rem;margin:0 0 14px}
+  .tool-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .tool-row:last-child{border-bottom:0}
+  .tool-row .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .dot.on{background:var(--ok)} .dot.off{background:var(--bad)}
+  .tool-row .info{flex:1;min-width:0}
+  .tool-row .info b{font-size:.86rem}
+  .tool-row .info span{display:block;color:var(--muted);font-size:.72rem}
+  .tool-row input,.tool-row select{width:150px;flex:none}
+  input,select,textarea{font-family:inherit;font-size:.85rem;padding:7px 10px;
+    border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text)}
+  input:focus,select:focus,textarea:focus{outline:2px solid #bfdbfe;border-color:var(--brand)}
+  textarea{width:100%;min-height:96px;resize:vertical}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:.8rem;font-weight:600;margin-bottom:4px}
+  .field .hint{font-size:.72rem;color:var(--muted)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  button.primary{width:100%;padding:11px;border:0;border-radius:8px;background:var(--brand);
+    color:#fff;font-size:.95rem;font-weight:600;cursor:pointer}
+  button.primary:hover{background:#1558b0}
+  button.primary:disabled{opacity:.5;cursor:not-allowed}
+  .cap-hint{color:var(--muted);font-size:.75rem}
+  .status-box{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px;font-family:ui-monospace,Consolas,monospace;
+    font-size:.75rem;max-height:340px;overflow:auto;white-space:pre-wrap}
+  .stage{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:.82rem;border-bottom:1px dashed #1e293b}
+  .stage:last-child{border-bottom:0}
+  .stage .st{flex:1}
+  .pill{padding:2px 8px;border-radius:999px;font-size:.68rem;font-weight:700}
+  .pill.completed{background:#14532d;color:#bbf7d0}
+  .pill.awaiting_human,.pill.blocked{background:#78350f;color:#fde68a}
+  .pill.failed{background:#7f1d1d;color:#fecaca}
+  .pill.in_progress,.pill.running,.pill.queued{background:#1e3a8a;color:#bfdbfe}
+  .err{color:#fca5a5;font-size:.78rem;margin-top:6px}
+  details{margin-top:6px}
+  summary{cursor:pointer;color:var(--muted);font-size:.8rem}
+  .saved-note{color:var(--muted);font-size:.72rem;margin-top:8px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>OpenMontage<small>自助配置台 · 用自己的 API 生成视频</small></h1>
+    <span id="llmBadge" class="badge warn">检测中…</span>
+    <nav class="nav">
+      <a href="/board/">进度看板</a>
+      <a href="/docs" onclick="return false">API 文档</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="grid">
+  <!-- 左列：key 配置 -->
+  <div>
+    <div class="card">
+      <h2>① 创意 LLM <span id="llmDot" class="dot off"></span></h2>
+      <p class="sub">用于写脚本/分镜/调研。留空则用服务器已配置的 key。</p>
+      <div class="row2">
+        <div class="field">
+          <label>Provider</label>
+          <select id="llmProvider" style="width:100%"></select>
+        </div>
+        <div class="field">
+          <label>API Key <span class="hint">（BYOK，可选）</span></label>
+          <input type="password" id="llmKey" style="width:100%" placeholder="sk-...">
+        </div>
+      </div>
+    </div>
+
+    <div id="capCards"><!-- 能力卡片由 JS 渲染 --></div>
+    <div class="card">
+      <h2>说明</h2>
+      <p class="sub">你填写的 key 只在<b>当前任务运行期间</b>注入服务器进程，绝不落盘、不对外返回。勾选“记住”后仅保存在你浏览器本地。</p>
+      <label><input type="checkbox" id="rememberKeys"> 记住我填的 key（浏览器 localStorage）</label>
+    </div>
+  </div>
+
+  <!-- 右列：任务提交 -->
+  <div>
+    <div class="card">
+      <h2>② 提交任务</h2>
+      <p class="sub">一句话 → 后台跑流水线 → 产出视频。</p>
+      <div class="field">
+        <label>你的需求（prompt）</label>
+        <textarea id="prompt" placeholder="例如：用动画解释 HTTP 与 HTTPS 的区别，时长 90 秒"></textarea>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Pipeline</label>
+          <select id="pipeline" style="width:100%"></select>
+        </div>
+        <div class="field">
+          <label>风格（Playbook）</label>
+          <select id="playbook" style="width:100%"><option value="">（默认）</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" id="creativeOnly" checked> 只跑创意阶段（最快验证，不触发生成工具）</label>
+        <p class="cap-hint">取消勾选 = 全流程：创意 → 素材 → 渲染成片（需要下方对应工具的 key）。</p>
+      </div>
+      <button class="primary" id="submitBtn" onclick="submitJob()">提交任务</button>
+      <div class="saved-note hidden" id="savedNote"></div>
+    </div>
+
+    <div class="card" id="statusCard">
+      <h2>③ 任务状态 <span id="jobState" class="badge warn">未提交</span></h2>
+      <div id="stages"></div>
+      <div class="status-box hidden" id="jobOut"></div>
+      <div class="err hidden" id="jobErr"></div>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let toolData = null, currentJob = null, pollTimer = null;
+
+async function init(){
+  try{
+    const [tools, pipes, playbooks] = await Promise.all([
+      fetch('/api/tools').then(r=>r.json()),
+      fetch('/api/pipelines').then(r=>r.json()),
+      fetch('/api/playbooks').then(r=>r.json()),
+    ]);
+    toolData = tools;
+    renderLlm(tools.llm);
+    renderCapabilities(tools);
+    fillSelect($('pipeline'), pipes.pipelines || [], 'animated-explainer');
+    fillSelect($('playbook'), playbooks.playbooks || [], '');
+    if (localStorage.getItem('om_keys')) loadSavedKeys();
+  }catch(e){
+    $('llmBadge').textContent = '服务异常'; $('llmBadge').className = 'badge bad';
+    console.error(e);
+  }
+}
+
+function fillSelect(sel, items, def){
+  sel.innerHTML = items.map(i => `<option value="${i}"${i===def?' selected':''}>${i}</option>`).join('');
+}
+
+function renderLlm(llm){
+  const sel = $('llmProvider');
+  sel.innerHTML = (llm.providers||[]).map(p =>
+    `<option value="${p}"${p==='openai'?' selected':''}>${p}</option>`).join('');
+  const ok = llm.server_configured;
+  $('llmBadge').textContent = ok ? '服务器已配置 LLM key' : '需填写 BYOK key';
+  $('llmBadge').className = 'badge ' + (ok ? 'ok' : 'warn');
+  $('llmDot').className = 'dot ' + (ok ? 'on' : 'off');
+}
+
+function renderCapabilities(tools){
+  const wrap = $('capCards');
+  const caps = tools.capabilities || {};
+  const order = (tools.capability_order||[]).filter(c => caps[c] && caps[c].label);
+  if(!order.length){ wrap.innerHTML = '<div class="card"><p class="sub">未发现工具注册表（服务器依赖未装全）。请先安装 requirements.txt。</p></div>'; return; }
+  wrap.innerHTML = order.map(cap => {
+    const c = caps[cap];
+    const avail = c.available||[];
+    const items = avail.map(t => toolRow(cap, t)).join('');
+    const unavailCount = (c.unavailable||[]).length;
+    return `<div class="card">
+      <h2>${c.label} <span class="cap-hint">${c.configured}/${c.total} 已配置</span></h2>
+      <div class="sub">该环节用到的工具；绿点 = 服务器已配好，红点 = 需要你填 key。</div>
+      ${items || '<p class="cap-hint">无可用工具</p>'}
+      ${unavailCount ? `<details><summary>另有 ${unavailCount} 个工具因缺依赖不可用（点击展开）</summary>
+        <div style="margin-top:6px">${(c.unavailable||[]).map(u =>
+          `<div class="tool-row"><span class="dot off"></span><div class="info"><b>${u.name||u}</b>
+           <span>${u.provider||''} · 需安装依赖/配置环境</span></div></div>`).join('')}</div></details>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toolRow(cap, t){
+  const keys = t.env_keys || [];
+  const configured = t.server_configured;
+  const missing = t.missing_keys || [];
+  if(!keys.length){
+    return `<div class="tool-row"><span class="dot ${configured?'on':'off'}"></span>
+      <div class="info"><b>${t.name}</b><span>${t.provider||''} · ${t.runtime||''} · 无需 key</span></div></div>`;
+  }
+  const id = keyId(cap, t.name, keys[0]);
+  const inputs = keys.map((k, i) => {
+    const kid = keyId(cap, t.name, k);
+    return `<input type="password" data-key="${k}" id="${kid}" placeholder="${k}" style="margin-left:${i?'6px':0}" ${configured?'disabled title="服务器已配置"':''}>`;
+  }).join('');
+  return `<div class="tool-row" data-cap="${cap}" data-tool="${t.name}">
+      <span class="dot ${configured?'on':'off'}"></span>
+      <div class="info"><b>${t.name}</b><span>${t.provider||''} · ${keys.join(' / ')}${configured ? ' · 已配置✓' : ' · 待填写'}</span></div>
+      ${inputs}
+    </div>`;
+}
+
+function keyId(cap, tool, key){ return 'k_' + tool + '_' + key.replace(/[^A-Z0-9]/gi,''); }
+
+async function submitJob(){
+  const prompt = $('prompt').value.trim();
+  if(!prompt){ alert('请先填写需求（prompt）'); return; }
+  const api_keys = collectKeys();
+  const body = {
+    prompt,
+    pipeline_type: $('pipeline').value,
+    style_playbook: $('playbook').value || null,
+    creative_only: $('creativeOnly').checked,
+    auto_approve: true,
+    llm_provider: $('llmProvider').value,
+    api_keys,
+  };
+  if($('rememberKeys').checked) saveKeys(api_keys);
+  const btn = $('submitBtn'); btn.disabled = true; btn.textContent = '提交中…';
+  try{
+    const r = await fetch('/api/jobs', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const j = await r.json();
+    if(!r.ok){ $('jobErr').textContent = '提交失败: ' + (j.detail || JSON.stringify(j)); $('jobErr').classList.remove('hidden'); return; }
+    currentJob = j.id;
+    $('jobErr').classList.add('hidden');
+    startPolling(j.id);
+  }catch(e){
+    $('jobErr').textContent = '提交失败: ' + e; $('jobErr').classList.remove('hidden');
+  }finally{ btn.disabled = false; btn.textContent = '提交任务'; }
+}
+
+function collectKeys(){
+  const keys = {};
+  document.querySelectorAll('input[data-key]').forEach(inp => {
+    const v = inp.value.trim();
+    if(v) keys[inp.dataset.key] = v;
+  });
+  const llmKey = $('llmKey').value.trim();
+  if(llmKey) keys[getLlmEnvVar($('llmProvider').value)] = llmKey;
+  return keys;
+}
+
+function getLlmEnvVar(provider){
+  return {openai:'OPENAI_API_KEY', openrouter:'OPENROUTER_API_KEY', anthropic:'ANTHROPIC_API_KEY',
+          gemini:'GEMINI_API_KEY', mistral:'MISTRAL_API_KEY', minimax:'MINIMAX_API_KEY'}[provider] || 'OPENAI_API_KEY';
+}
+
+function startPolling(jobId){
+  $('statusCard').classList.remove('hidden');
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => fetch('/api/jobs/'+jobId).then(r=>r.json()).then(renderJob).catch(()=>{}), 2500);
+  fetch('/api/jobs/'+jobId).then(r=>r.json()).then(renderJob).catch(()=>{});
+}
+
+function renderJob(j){
+  const state = $('jobState');
+  state.textContent = j.status || '?';
+  state.className = 'badge ' + (['completed'].includes(j.status) ? 'ok' : (['blocked','failed'].includes(j.status) ? 'bad' : 'warn'));
+  $('stages').innerHTML = (j.stages||[]).map(s =>
+    `<div class="stage"><span class="st">${s.stage}</span>
+     <span class="pill ${(s.status||'').replace(/ /g,'_')}">${s.status||''}</span></div>`).join('') ||
+    '<p class="cap-hint">等待 worker 启动…</p>';
+  const out = {id:j.id, project_id:j.project_id, status:j.status, blocker:j.blocker};
+  $('jobOut').textContent = JSON.stringify(out, null, 2);
+  $('jobOut').classList.remove('hidden');
+  if(['completed','blocked','failed'].includes(j.status)) clearInterval(pollTimer);
+}
+
+// ---- key 记住/回填（仅浏览器 localStorage）----
+function saveKeys(keys){ localStorage.setItem('om_keys', JSON.stringify(keys)); }
+function loadSavedKeys(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('om_keys')) || {};
+    document.querySelectorAll('input[data-key]').forEach(inp => {
+      if(saved[inp.dataset.key]) inp.value = saved[inp.dataset.key];
+    });
+    if(saved.OPENAI_API_KEY && !$('llmKey').value) $('llmKey').value = saved.OPENAI_API_KEY;
+    $('rememberKeys').checked = true;
+    $('savedNote').textContent = '已从浏览器记忆回填 key（仅本机可见）。';
+    $('savedNote').classList.remove('hidden');
+  }catch(e){}
+}
+
+init();
+</script>
+</body>
+</html>

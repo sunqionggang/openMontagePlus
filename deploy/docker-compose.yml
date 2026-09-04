@@ -1,0 +1,28 @@
+# OpenMontage 自托管在线层 —— 腾讯云部署编排
+# 用法：服务器上项目根目录执行  docker compose up -d --build
+# 数据持久化：
+#   ./projects            -> 作品/任务/checkpoint（关键数据，别删）
+#   ./.env.prod           -> 生产环境变量（从 .env 过滤生成，别提交到 git）
+services:
+  openmontage:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    container_name: openmontage
+    restart: unless-stopped
+    ports:
+      - "8000:8000"               # 云安全组需放行 8000（或前置 Nginx 反代）
+    env_file:
+      - .env.prod
+    environment:
+      - OM_DB_PATH=/app/projects/_data/om_data.json
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./projects:/app/projects          # 作品/任务数据持久化
+      - ./music_library:/app/music_library:ro   # 本地音乐库（可选）
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s

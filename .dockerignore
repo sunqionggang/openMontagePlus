@@ -1,0 +1,41 @@
+# 版本控制
+.git
+.gitignore
+.github
+
+# 本地环境（绝不打进镜像）
+.venv
+.venv_bak
+.workbuddy
+.om
+om.db
+*.log
+.env                 # 密钥不进镜像！运行时用 env_file(.env.prod) 注入
+
+# 大目录：前端合成引擎（需要时用卷单独挂载）
+remotion-composer
+node_modules
+
+# 数据目录（通过 docker-compose 卷挂载持久化）
+projects
+music_library
+
+# 文档/示例：保留 docs/*.html（/prototype、/marketing 路由必需），排除视频图片
+docs/*.mp4
+docs/images
+assets
+probe_*.mp3
+diagram.png
+
+# 部署包自身（避免循环打包）
+openmontage-deploy.tar.gz
+deploy/*.sh
+deploy/DEPLOY_TENCENT.md
+deploy/docker-compose.yml
+deploy/package.sh
+
+# 注意：deploy/Dockerfile 保留在构建上下文（compose 引用它）
+
+# Python 缓存
+__pycache__
+*.pyc
